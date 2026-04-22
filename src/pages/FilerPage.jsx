@@ -337,7 +337,7 @@ function TickerAttributionSection({ rows }) {
           <span className="tabular-nums text-right">Trades</span>
           <span className="tabular-nums text-right">Buy / Sell mix</span>
           <span className="tabular-nums text-right">Hit rate</span>
-          <span className="tabular-nums text-right">Ticker alpha</span>
+          <span className="tabular-nums text-right">vs SPY</span>
         </div>
         <div className="divide-y divide-stroke_soft">
           {top.map((r, i) => {
