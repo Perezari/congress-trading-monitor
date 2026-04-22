@@ -277,7 +277,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
       <ImaginaryPortfolio trades={trades} />
 
       {stats.weightedExcess != null && stats.alphaDrivers && stats.alphaDrivers.length > 0 && (
-        <AlphaDriversSection drivers={stats.alphaDrivers} weightedExcess={stats.weightedExcess} />
+        <AlphaDriversSection drivers={stats.alphaDrivers} />
       )}
 
       {stats.tickerAttribution && stats.tickerAttribution.filter((t) => t.ticker).length > 0 && (
@@ -406,14 +406,13 @@ function isLongHold(dateStr) {
 // "What drove this alpha" breakdown. Shows the top 8 purchases by absolute
 // contribution to the weighted-alpha numerator, plus a headline that states
 // how concentrated the excess return really is.
-const DRIVER_GRID = "28px 84px minmax(0,1fr) 92px 60px 96px 80px 156px 44px";
+const DRIVER_GRID = "28px 84px minmax(0,1fr) 92px 60px 80px 80px 80px 44px";
 
-function AlphaDriversSection({ drivers, weightedExcess }) {
+function AlphaDriversSection({ drivers }) {
   const top = drivers.slice(0, 8);
   const topShare = top.reduce((s, d) => s + d.share, 0);
   const topTicker = top[0]?.ticker;
   const topTickerShare = top.filter((d) => d.ticker === topTicker).reduce((s, d) => s + d.share, 0);
-  const maxContribAbs = Math.abs(top[0]?.contribution ?? 1);
 
   const subtitle =
     topTicker && topTickerShare > 50
@@ -437,18 +436,17 @@ function AlphaDriversSection({ drivers, weightedExcess }) {
           <span className="tabular-nums text-right">Held</span>
           <span className="tabular-nums text-right">Size</span>
           <span className="tabular-nums text-right">Return</span>
-          <span className="tabular-nums text-right">vs SPY · share</span>
+          <span className="tabular-nums text-right">vs SPY</span>
           <span className="text-right"></span>
         </div>
         <div className="divide-y divide-stroke_soft">
           {top.map((d, i) => {
             const ex = d.excess ?? 0;
             const ret = d.ret ?? 0;
-            const barWidth = Math.min(100, (Math.abs(d.contribution) / maxContribAbs) * 100);
             return (
               <div
                 key={d.id}
-                className="grid gap-3 px-4 py-[10px] items-center text-small hover:bg-muted/70"
+                className="grid gap-3 px-4 py-[10px] items-center text-small even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
                 style={{ gridTemplateColumns: DRIVER_GRID }}
               >
                 <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
@@ -468,19 +466,10 @@ function AlphaDriversSection({ drivers, weightedExcess }) {
                   {ret >= 0 ? "+" : ""}
                   {ret.toFixed(0)}%
                 </span>
-                <div className="flex items-center justify-end gap-2 tabular-nums">
-                  <div className="h-[3px] w-[72px] rounded-full bg-stroke overflow-hidden">
-                    <div
-                      className={`h-full ${ex >= 0 ? "bg-buy" : "bg-sell"} opacity-80`}
-                      style={{ width: `${barWidth}%` }}
-                    />
-                  </div>
-                  <span className={`font-semibold min-w-[48px] text-right ${ex >= 0 ? "text-buy" : "text-sell"}`}>
-                    {ex >= 0 ? "+" : ""}
-                    {ex.toFixed(0)}%
-                  </span>
-                  <span className="text-ink_muted text-mini min-w-[34px] text-right">{d.share.toFixed(0)}%</span>
-                </div>
+                <span className={`text-right tabular-nums font-semibold ${ex >= 0 ? "text-buy" : "text-sell"}`}>
+                  {ex >= 0 ? "+" : ""}
+                  {ex.toFixed(0)}%
+                </span>
                 <div className="text-right">
                   {d.doc_url && (
                     <a
