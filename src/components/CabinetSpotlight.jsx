@@ -66,7 +66,7 @@ export default function CabinetSpotlight({ filers, trades }) {
   return (
     <div>
       <SectionHeader
-        title="Trump II cabinet activity"
+        title="Cabinet activity"
         subtitle={`${fmtInt(spotlight.officials.length)} officials · ${fmtInt(spotlight.totalTrades)} trades · ${fmtUSD(spotlight.totalVol)} since 2025-01-20`}
         right={
           <Link to="/filers?admin=trump2&branch=executive" className="text-small no-underline hover:no-underline">
