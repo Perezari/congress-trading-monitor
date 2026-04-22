@@ -58,27 +58,6 @@ export default function AboutPage({ data }) {
             </span>
           </div>
         )}
-        {/* Anchor nav — three jump-links to help people skim the page */}
-        <nav className="mt-6 flex flex-wrap items-center gap-2 text-mini">
-          <a
-            href="#law"
-            className="px-2.5 h-7 inline-flex items-center border border-stroke rounded-md bg-panel text-ink_muted hover:text-ink hover:border-ink_faint"
-          >
-            The law
-          </a>
-          <a
-            href="#sources"
-            className="px-2.5 h-7 inline-flex items-center border border-stroke rounded-md bg-panel text-ink_muted hover:text-ink hover:border-ink_faint"
-          >
-            Data sources
-          </a>
-          <a
-            href="#methodology"
-            className="px-2.5 h-7 inline-flex items-center border border-stroke rounded-md bg-panel text-ink_muted hover:text-ink hover:border-ink_faint"
-          >
-            Methodology caveats
-          </a>
-        </nav>
       </div>
 
       <div id="law" className="mt-12 max-w-3xl scroll-mt-20">
