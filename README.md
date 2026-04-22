@@ -37,34 +37,6 @@ Open [http://localhost:5183](http://localhost:5183)
 
 All data is served as static JSON in `public/data/` and loaded client-side. No backend required.
 
-| File | Description |
-|------|-------------|
-| `public/data/stats.json` | Global KPIs (totals, source breakdown, date range) |
-| `public/data/trades.json` | All parsed transactions |
-| `public/data/filers.json` | Politicians / officials with biographical metadata |
-| `public/data/tickers.json` | Aggregated per-ticker stats |
-| `public/data/returns.json` | Per-filer excess-return computations |
-| `public/data/prices.json` | Price series used for return calculations |
-| `public/data/scatter.json` | Hero scatter coordinates (filer activity vs. volume) |
-| `public/data/timeseries.json` | Monthly trade counts by source |
-| `public/data/alpha-index.json` | Alphabetical filer index for navigation |
-| `public/data/admin-stats.json` | Administration-level aggregates |
-| `public/data/filer/{id}.json` | Per-filer drill-down data |
-| `public/data/ticker/{symbol}.json` | Per-ticker drill-down data |
-
-## Data sources
-
-All three sources are public records under the Ethics in Government Act and the STOCK Act.
-
-- **House Clerk** -- [disclosures-clerk.house.gov/FinancialDisclosure](https://disclosures-clerk.house.gov/FinancialDisclosure). Annual ZIPs with XML index + individual PTR PDFs. Fully bulk-downloadable.
-- **Senate eFD** -- [efdsearch.senate.gov](https://efdsearch.senate.gov). HTML reports (post-2015) + PDF scans. Requires session + CSRF + agreement POST.
-- **OGE Executive Branch** -- [oge.gov](https://www.oge.gov/web/oge.nsf/Officials%20Individual%20Disclosures%20Search%20Collection). Form 278-T (STOCK Act equivalent for the executive branch). PAS officials publish PDFs directly, most other entries require a Form 201 request.
-
-We use [kadoa.com](https://kadoa.com) to collect, parse, and normalize the data. Need the full historical dataset with continuous updates? [Get in touch](https://www.kadoa.com/contact/sales).
-
-## Legal note
-
-The Senate eFD is governed by 5 U.S.C. app. § 105(c), which prohibits use of filings for "any commercial purpose, other than by news and communications media for dissemination to the general public." Civil penalty up to $10,000. This project is built for journalism and civic transparency.
 
 ## What's next
 
@@ -72,6 +44,8 @@ The Senate eFD is governed by 5 U.S.C. app. § 105(c), which prohibits use of fi
 - OGE Form 201 request workflow for request-only entries (~80% of OGE filings)
 - Senate pre-2015 paper-filing PDFs (currently skipped)
 - Net worth and portfolio derivation from annual 278 reports
+- Live updates
+- Notifications
 
 ## License
 
