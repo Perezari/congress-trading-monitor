@@ -38,7 +38,8 @@ export function cleanAssetName(s) {
   out = out.replace(/\s\([A-Za-z]{2,5}\)\s*$/, "").trim();
   // A leading comma/period + lowercase means we're looking at a sentence
   // fragment that bled in from the PTR comment field. Nothing we can salvage.
-  if (/^[,.]\s|^[a-z]/.test(out)) out = "";
+  // (Do NOT blank lowercase-starting names — iShares, eBay, iRobot, etc. are valid.)
+  if (/^[,.]\s[a-z]/.test(out)) out = "";
   return out;
 }
 
