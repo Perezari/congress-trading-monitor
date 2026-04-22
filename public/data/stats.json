@@ -1,0 +1,18 @@
+{
+  "totalTrades": 54102,
+  "totalFilers": 380,
+  "totalFilings": 48828,
+  "totalParsedFilings": 7486,
+  "lateFilings": 9937,
+  "estVolumeUsd": 5112469532,
+  "dateRange": {
+    "from": "2012-02-27",
+    "to": "2026-04-09"
+  },
+  "bySource": {
+    "house_clerk": 42655,
+    "oge_executive": 3226,
+    "senate_efd": 8221
+  },
+  "generatedAt": "2026-04-22T16:41:06.657Z"
+}
