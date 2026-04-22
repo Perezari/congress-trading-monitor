@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fcfcfd"/>
+      <stop offset="100%" stop-color="#eaeaf2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="60" y="60" width="1080" height="510" rx="16" fill="#ffffff" stroke="#e1e1e1" stroke-width="1"/>
+
+  <text x="120" y="180" font-family="Inter, system-ui, sans-serif" font-size="96" font-weight="700" fill="#23252a" letter-spacing="-3">🏛️ Congress</text>
+  <text x="120" y="290" font-family="Inter, system-ui, sans-serif" font-size="96" font-weight="700" fill="#23252a" letter-spacing="-3">Trading Monitor</text>
+
+  <text x="120" y="370" font-family="Inter, system-ui, sans-serif" font-size="34" font-weight="500" fill="#5d5d5f">Every stock trade disclosed by U.S. Congress and the</text>
+  <text x="120" y="415" font-family="Inter, system-ui, sans-serif" font-size="34" font-weight="500" fill="#5d5d5f">executive branch under the STOCK Act.</text>
+
+  <g transform="translate(120, 490)">
+    <rect x="0" y="0" width="200" height="60" rx="10" fill="#eaeaf2"/>
+    <text x="24" y="38" font-family="JetBrains Mono, ui-monospace, monospace" font-size="26" font-weight="700" fill="#5e6ad2">54,102 trades</text>
+  </g>
+  <g transform="translate(344, 490)">
+    <rect x="0" y="0" width="160" height="60" rx="10" fill="#eaeaf2"/>
+    <text x="24" y="38" font-family="JetBrains Mono, ui-monospace, monospace" font-size="26" font-weight="700" fill="#5e6ad2">380 filers</text>
+  </g>
+  <g transform="translate(528, 490)">
+    <rect x="0" y="0" width="200" height="60" rx="10" fill="#eaeaf2"/>
+    <text x="24" y="38" font-family="JetBrains Mono, ui-monospace, monospace" font-size="26" font-weight="700" fill="#5e6ad2">2012 – today</text>
+  </g>
+
+  <text x="1080" y="560" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="500" fill="#ababab" text-anchor="end">congress.kadoa.com</text>
+</svg>
