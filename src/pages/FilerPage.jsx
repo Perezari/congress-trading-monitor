@@ -281,7 +281,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
       )}
 
       {stats.tickerAttribution && stats.tickerAttribution.filter((t) => t.ticker).length > 0 && (
-        <TickerAttributionSection rows={stats.tickerAttribution.filter((t) => t.ticker)} prices={prices} />
+        <TickerAttributionSection rows={stats.tickerAttribution.filter((t) => t.ticker)} />
       )}
 
       <div className="mb-10">
@@ -318,9 +318,9 @@ function BranchDotPill({ filer }) {
 
 // Performance by ticker: net contribution to weighted alpha per symbol.
 // Quant desks want to see: 'is alpha from one lucky name or broad-based?'
-const TICKER_GRID = "36px 110px 80px 120px 110px 140px minmax(96px,1fr)";
+const TICKER_GRID = "36px 120px 80px 120px 110px minmax(140px,1fr)";
 
-function TickerAttributionSection({ rows, prices = {} }) {
+function TickerAttributionSection({ rows }) {
   const top = rows.slice(0, 15);
   return (
     <div className="mb-10">
@@ -338,30 +338,20 @@ function TickerAttributionSection({ rows, prices = {} }) {
           <span className="tabular-nums text-right">Buy / Sell mix</span>
           <span className="tabular-nums text-right">Hit rate</span>
           <span className="tabular-nums text-right">Ticker alpha</span>
-          <span className="tabular-nums text-right">Contribution</span>
         </div>
         <div className="divide-y divide-stroke_soft">
           {top.map((r, i) => {
             const alpha = r.tickerAlpha;
-            const p = prices[r.ticker];
-            const change =
-              p?.latest && p?.previous ? ((p.latest.close - p.previous.close) / p.previous.close) * 100 : null;
             return (
               <button
                 key={r.ticker}
                 onClick={() => navigate(`/ticker/${r.ticker}`)}
-                className="w-full grid gap-3 px-4 py-[10px] items-center text-left text-small hover:bg-muted/70"
+                className="w-full grid gap-3 px-4 py-[10px] items-center text-left text-small even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
                 style={{ gridTemplateColumns: TICKER_GRID }}
               >
                 <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
-                <div className="flex items-center gap-1.5 min-w-0">
+                <div className="flex items-center min-w-0">
                   <TickerLabel ticker={r.ticker} size="sm" />
-                  {change != null && (
-                    <span className={`text-mini tabular-nums ${change >= 0 ? "text-buy" : "text-sell"}`}>
-                      {change >= 0 ? "+" : ""}
-                      {change.toFixed(1)}%
-                    </span>
-                  )}
                 </div>
                 <span className="tabular-nums text-right text-ink">{r.total}</span>
                 <span className="text-mini tabular-nums text-right whitespace-nowrap">
@@ -386,12 +376,6 @@ function TickerAttributionSection({ rows, prices = {} }) {
                   className={`tabular-nums text-right font-medium ${alpha == null ? "text-ink_faint" : alpha >= 0 ? "text-buy" : "text-sell"}`}
                 >
                   {alpha == null ? "—" : `${alpha >= 0 ? "+" : ""}${alpha.toFixed(0)}%`}
-                </span>
-                <span
-                  className={`text-right text-mini tabular-nums ${r.signedContribShare >= 0 ? "text-buy" : "text-sell"}`}
-                >
-                  {r.signedContribShare >= 0 ? "+" : ""}
-                  {r.signedContribShare.toFixed(0)}%
                 </span>
               </button>
             );
