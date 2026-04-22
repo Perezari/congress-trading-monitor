@@ -75,6 +75,8 @@ export default function CabinetSpotlight({ filers, trades }) {
         }
       />
       <div className="border border-stroke rounded-md bg-panel overflow-hidden">
+        <div className="overflow-x-auto">
+        <div className="min-w-[720px]">
         <div className={`grid grid-cols-[32px_minmax(0,1.3fr)_minmax(0,1fr)_70px_136px_110px] gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}>
           <span className="text-right">#</span>
           <span>Official</span>
@@ -121,6 +123,8 @@ export default function CabinetSpotlight({ filers, trades }) {
               </button>
             );
           })}
+        </div>
+        </div>
         </div>
       </div>
     </div>
