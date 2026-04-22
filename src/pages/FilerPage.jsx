@@ -276,46 +276,36 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
         )}
       </div>
 
-      {/* Linear-style horizontal property row — compact KPIs, semantic color only on alpha/hit-rate */}
-      <div className="border-t border-stroke pt-4 pb-1 mb-8 flex flex-wrap items-start gap-x-10 gap-y-4">
-        <Prop
-          label="Trades"
-          value={fmtInt(stats.count)}
-          sub={`${fmtInt(stats.buys)} buys · ${fmtInt(stats.sells)} sells`}
-        />
-        <Prop label="Capital deployed" value={fmtUSD(stats.volume)} sub="midpoint of ranges" />
-        {stats.weightedExcess != null ? (
-          <Prop
-            label="Cumulative vs SPY"
-            value={`${stats.weightedExcess >= 0 ? "+" : ""}${stats.weightedExcess.toFixed(0)}%`}
-            tone={stats.weightedExcess >= 0 ? "buy" : "sell"}
-            sub={`dollar-weighted · ${stats.scoredBuys} scored buys`}
-          />
-        ) : (
-          <Prop label="Cumulative vs SPY" value="—" sub="no scored buys" />
+      {/* One-line activity strip. Returns/portfolio metrics are owned by the
+          ImaginaryPortfolio section below so we don't stack two stat bands. */}
+      <div className="border-t border-stroke pt-3 mb-8 text-small text-ink_muted flex flex-wrap items-center gap-x-5 gap-y-1 tabular-nums">
+        <span>
+          <span className="text-ink font-medium">{fmtInt(stats.count)}</span> trades
+          <span className="text-ink_faint"> ({fmtInt(stats.buys)} / {fmtInt(stats.sells)})</span>
+        </span>
+        <span>
+          <span className="text-ink font-medium">{fmtUSD(stats.volume)}</span> deployed
+        </span>
+        {stats.hitRate != null && (
+          <span>
+            Hit rate{" "}
+            <span className={`font-medium ${stats.hitRate >= 0.5 ? "text-buy" : "text-sell"}`}>
+              {(stats.hitRate * 100).toFixed(0)}%
+            </span>
+          </span>
         )}
-        {stats.hitRate != null ? (
-          <Prop
-            label="Hit rate"
-            value={`${(stats.hitRate * 100).toFixed(0)}%`}
-            tone={stats.hitRate >= 0.5 ? "buy" : "sell"}
-            sub={`${stats.wins}/${stats.scoredBuys} beat SPY`}
-          />
-        ) : null}
-        <Prop
-          label="Net bias"
-          value={
-            netBiasPct === 0 ? "Neutral" : netBiasPct > 0 ? `+${netBiasPct.toFixed(0)}%` : `${netBiasPct.toFixed(0)}%`
-          }
-          tone={netBiasPct > 0 ? "buy" : netBiasPct < 0 ? "sell" : "neutral"}
-          sub={netBiasPct === 0 ? "balanced" : netBiasPct > 0 ? "buy-side tilt" : "sell-side tilt"}
-        />
-        <Prop
-          label="On-time filings"
-          value={`${onTimePct.toFixed(0)}%`}
-          tone={onTimePct >= 80 ? "neutral" : "warn"}
-          sub={`${fmtInt(stats.late)} of ${fmtInt(stats.count)} filed late`}
-        />
+        <span>
+          Net bias{" "}
+          <span className={`font-medium ${netBiasPct > 0 ? "text-buy" : netBiasPct < 0 ? "text-sell" : "text-ink"}`}>
+            {netBiasPct === 0 ? "Neutral" : netBiasPct > 0 ? `+${netBiasPct.toFixed(0)}%` : `${netBiasPct.toFixed(0)}%`}
+          </span>
+        </span>
+        <span>
+          On-time{" "}
+          <span className={`font-medium ${onTimePct >= 80 ? "text-ink" : "text-warn"}`}>
+            {onTimePct.toFixed(0)}%
+          </span>
+        </span>
       </div>
 
       <ImaginaryPortfolio trades={trades} />
@@ -340,21 +330,6 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
         <FilterBar filters={filters} setFilters={setFilters} trades={trades} />
       </div>
       <TradesTable trades={filtered} tall filersById={filersById} />
-    </div>
-  );
-}
-
-// Linear-style "property row" cell. Compact, label on top, value below, optional sub.
-function Prop({ label, value, sub, tone = "neutral" }) {
-  const toneCls =
-    tone === "buy" ? "text-buy" : tone === "sell" ? "text-sell" : tone === "warn" ? "text-warn" : "text-ink";
-  return (
-    <div className="min-w-0">
-      <div className="text-mini text-ink_muted ">{label}</div>
-      <div className={`mt-1 text-[1.25rem] font-semibold leading-none tabular-nums tracking-[-0.008em] ${toneCls}`}>
-        {value}
-      </div>
-      {sub && <div className="text-mini text-ink_faint mt-1 tabular-nums">{sub}</div>}
     </div>
   );
 }
