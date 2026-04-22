@@ -276,39 +276,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
         )}
       </div>
 
-      {/* One-line activity strip. Returns/portfolio metrics are owned by the
-          ImaginaryPortfolio section below so we don't stack two stat bands. */}
-      <div className="border-t border-stroke pt-3 mb-8 text-small text-ink_muted flex flex-wrap items-center gap-x-5 gap-y-1 tabular-nums">
-        <span>
-          <span className="text-ink font-medium">{fmtInt(stats.count)}</span> trades
-          <span className="text-ink_faint"> ({fmtInt(stats.buys)} / {fmtInt(stats.sells)})</span>
-        </span>
-        <span>
-          <span className="text-ink font-medium">{fmtUSD(stats.volume)}</span> deployed
-        </span>
-        {stats.hitRate != null && (
-          <span>
-            Hit rate{" "}
-            <span className={`font-medium ${stats.hitRate >= 0.5 ? "text-buy" : "text-sell"}`}>
-              {(stats.hitRate * 100).toFixed(0)}%
-            </span>
-          </span>
-        )}
-        <span>
-          Net bias{" "}
-          <span className={`font-medium ${netBiasPct > 0 ? "text-buy" : netBiasPct < 0 ? "text-sell" : "text-ink"}`}>
-            {netBiasPct === 0 ? "Neutral" : netBiasPct > 0 ? `+${netBiasPct.toFixed(0)}%` : `${netBiasPct.toFixed(0)}%`}
-          </span>
-        </span>
-        <span>
-          On-time{" "}
-          <span className={`font-medium ${onTimePct >= 80 ? "text-ink" : "text-warn"}`}>
-            {onTimePct.toFixed(0)}%
-          </span>
-        </span>
-      </div>
-
-      <ImaginaryPortfolio trades={trades} />
+      <ImaginaryPortfolio trades={trades} stats={stats} netBiasPct={netBiasPct} onTimePct={onTimePct} />
 
       {stats.weightedExcess != null && stats.alphaDrivers && stats.alphaDrivers.length > 0 && (
         <AlphaDriversSection drivers={stats.alphaDrivers} weightedExcess={stats.weightedExcess} />
@@ -569,7 +537,7 @@ function AlphaDriversSection({ drivers, weightedExcess }) {
 // every disclosed buy to today's close. Reframes the hold-to-today methodology
 // as a feature rather than a caveat — "If Marshall never sold his 2017 NVDA,
 // he'd have a $3M tech portfolio today." The math is mid_amount × ret_since.
-function ImaginaryPortfolio({ trades }) {
+function ImaginaryPortfolio({ trades, stats, netBiasPct, onTimePct }) {
   const data = useMemo(() => {
     const buys = trades.filter((t) => {
       const tt = (t.transaction_type || "").toLowerCase();
@@ -677,9 +645,53 @@ function ImaginaryPortfolio({ trades }) {
             <div className="text-mini text-ink_faint mt-1.5">{fmtInt(data.scoredBuys)} buys scored</div>
           </div>
         </div>
+        {stats && (
+          <div className="mt-5 pt-4 border-t border-stroke_soft text-small text-ink_muted flex flex-wrap items-center gap-x-5 gap-y-1 tabular-nums">
+            <span>
+              <span className="text-ink font-medium">{fmtInt(stats.count)}</span> trades
+              <span className="text-ink_faint">
+                {" "}
+                ({fmtInt(stats.buys)} / {fmtInt(stats.sells)})
+              </span>
+            </span>
+            <span>
+              <span className="text-ink font-medium">{fmtUSD(stats.volume)}</span> deployed
+            </span>
+            {stats.hitRate != null && (
+              <span>
+                Hit rate{" "}
+                <span className={`font-medium ${stats.hitRate >= 0.5 ? "text-buy" : "text-sell"}`}>
+                  {(stats.hitRate * 100).toFixed(0)}%
+                </span>
+              </span>
+            )}
+            {netBiasPct != null && (
+              <span>
+                Net bias{" "}
+                <span
+                  className={`font-medium ${netBiasPct > 0 ? "text-buy" : netBiasPct < 0 ? "text-sell" : "text-ink"}`}
+                >
+                  {netBiasPct === 0
+                    ? "Neutral"
+                    : netBiasPct > 0
+                      ? `+${netBiasPct.toFixed(0)}%`
+                      : `${netBiasPct.toFixed(0)}%`}
+                </span>
+              </span>
+            )}
+            {onTimePct != null && (
+              <span>
+                On-time{" "}
+                <span className={`font-medium ${onTimePct >= 80 ? "text-ink" : "text-warn"}`}>
+                  {onTimePct.toFixed(0)}%
+                </span>
+              </span>
+            )}
+          </div>
+        )}
       </Card>
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden mt-4">
         <div className="overflow-x-auto">
           <div className="min-w-[760px]">
             <div
