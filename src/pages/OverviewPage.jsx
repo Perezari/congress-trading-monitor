@@ -9,7 +9,7 @@ import { fmtInt, Link, SectionHeader } from "../ui";
 export default function OverviewPage({ data }) {
   const { stats, filers, tickers, trades = [], returns = [], prices = {} } = data;
 
-  const headline = "Monitor Congressional stock trades";
+  const headline = "Monitor every stock trade Congress makes";
   const subline = `${fmtInt(stats?.totalTrades)} transactions from ${fmtInt(stats?.totalFilers)} members of Congress and senior executive branch officials, parsed directly from the Clerk of the House, OGE, and Senate eFD.`;
 
   return (
