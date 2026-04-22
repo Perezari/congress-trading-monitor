@@ -4,10 +4,9 @@ import { useQueryState } from "../router";
 import TradesTable from "../TradesTable";
 import { fmtInt, SectionHeader } from "../ui";
 
-const FILTER_KEYS = ["q", "admin", "source", "type", "size", "late", "party", "state"];
+const FILTER_KEYS = ["q", "source", "type", "size", "late", "party", "state"];
 const QUERY_DEFAULTS = {
   q: "",
-  admin: "all",
   source: "all",
   type: "all",
   size: "all",
@@ -21,7 +20,6 @@ function toFilters(qs) {
   return {
     ...defaultFilters,
     search: qs.q,
-    admin: qs.admin,
     source: qs.source,
     type: qs.type,
     size: qs.size,
@@ -42,7 +40,6 @@ export default function TradesPage({ data }) {
       const merged = typeof updater === "function" ? updater(toFilters(prev)) : { ...toFilters(prev), ...updater };
       return {
         q: merged.search,
-        admin: merged.admin,
         source: merged.source,
         type: merged.type,
         size: merged.size,
@@ -79,7 +76,6 @@ export default function TradesPage({ data }) {
     if (qs[k] && qs[k] !== QUERY_DEFAULTS[k]) {
       const label = {
         q: "Search",
-        admin: "Admin",
         source: "Source",
         type: "Type",
         size: "Size",

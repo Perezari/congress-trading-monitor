@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ADMINISTRATIONS, dateInAdmin, findAdmin } from "../ui";
 
 export default function FilterBar({ filters, setFilters, trades }) {
   const options = React.useMemo(() => {
@@ -31,11 +30,6 @@ export default function FilterBar({ filters, setFilters, trades }) {
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-2">
         <SearchBox value={filters.search} onChange={set("search")} />
-        <Segmented
-          options={ADMINISTRATIONS.map((a) => ({ k: a.k, label: a.short }))}
-          value={filters.admin || "all"}
-          onChange={set("admin")}
-        />
         <Segmented
           options={[
             { k: "all", label: "All sources" },
@@ -260,7 +254,6 @@ function Dropdown({ label, placeholder, options, value, onChange }) {
 
 export const defaultFilters = {
   search: "",
-  admin: "all",
   source: "all",
   type: "all",
   size: "all",
@@ -270,9 +263,7 @@ export const defaultFilters = {
 };
 
 export function applyFilters(trades, filters) {
-  const admin = findAdmin(filters.admin || "all");
   return trades.filter((t) => {
-    if (admin.k !== "all" && !dateInAdmin(t.transaction_date, admin)) return false;
     if (filters.source !== "all" && t.source_id !== filters.source) return false;
     if (filters.party !== "all" && t.party !== filters.party) return false;
     if (filters.state !== "all" && t.state !== filters.state) return false;

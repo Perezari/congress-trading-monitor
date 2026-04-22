@@ -1,18 +1,7 @@
 import React, { useMemo } from "react";
 import { TickerBadge, TickerLabel } from "../components/TickerBadge";
 import { navigate, useQueryState } from "../router";
-import {
-  ADMINISTRATIONS,
-  Card,
-  dateInAdmin,
-  findAdmin,
-  fmtInt,
-  fmtUSD,
-  SectionHeader,
-  Segmented,
-  TABLE_HEADER_CLS,
-  TABLE_ZEBRA_CLS,
-} from "../ui";
+import { Card, fmtInt, fmtUSD, SectionHeader, Segmented, TABLE_HEADER_CLS } from "../ui";
 
 const SORTS = {
   trades: { label: "Most trades", fn: (a, b) => b.trade_count - a.trade_count },
@@ -32,62 +21,26 @@ function dailyChange(p) {
 }
 
 export default function TickersPage({ data }) {
-  const { tickers = [], trades = [], prices = {} } = data;
-  const [qs, setQs] = useQueryState(["q", "sort", "admin"], { q: "", sort: "trades", admin: "all" });
-  const admin = findAdmin(qs.admin);
-  const adminActive = admin.k !== "all";
-
-  // When an admin is chosen, recompute ticker aggregates from the admin-filtered
-  // trade set. Otherwise use the pre-aggregated tickers.json for speed.
-  const scopedTickers = useMemo(() => {
-    if (!adminActive) return tickers;
-    const m = new Map();
-    for (const t of trades) {
-      if (!t.ticker) continue;
-      if (!dateInAdmin(t.transaction_date, admin)) continue;
-      if (!m.has(t.ticker))
-        m.set(t.ticker, {
-          ticker: t.ticker,
-          trade_count: 0,
-          purchases: 0,
-          sales: 0,
-          filer_set: new Set(),
-          est_volume: 0,
-        });
-      const e = m.get(t.ticker);
-      e.trade_count++;
-      const tt = (t.transaction_type || "").toLowerCase();
-      if (tt.includes("urchase") || tt === "p") e.purchases++;
-      else if (tt.includes("ale") || tt === "s") e.sales++;
-      if (t.filer_id) e.filer_set.add(t.filer_id);
-      const mid = t.amount_range_low && t.amount_range_high ? (t.amount_range_low + t.amount_range_high) / 2 : 0;
-      e.est_volume += mid;
-    }
-    return [...m.values()].map((t) => ({ ...t, filer_count: t.filer_set.size }));
-  }, [tickers, trades, admin, adminActive]);
+  const { tickers = [], prices = {} } = data;
+  const [qs, setQs] = useQueryState(["q", "sort"], { q: "", sort: "trades" });
 
   const filtered = useMemo(() => {
     const q = qs.q.toLowerCase().trim();
-    const list = q ? scopedTickers.filter((t) => (t.ticker || "").toLowerCase().includes(q)) : scopedTickers;
+    const list = q ? tickers.filter((t) => (t.ticker || "").toLowerCase().includes(q)) : tickers;
     const sorter = SORTS[qs.sort] ?? SORTS.trades;
     return [...list].sort(sorter.fn);
-  }, [scopedTickers, qs]);
+  }, [tickers, qs]);
 
-  // Use scoped ticker list so the chips track admin filter.
   const mostWidelyHeld = useMemo(
-    () => [...scopedTickers].sort((a, b) => b.filer_count - a.filer_count).slice(0, 6),
-    [scopedTickers],
+    () => [...tickers].sort((a, b) => b.filer_count - a.filer_count).slice(0, 6),
+    [tickers],
   );
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 pt-8 pb-16">
       <SectionHeader
         title="Tickers"
-        subtitle={
-          adminActive
-            ? `${fmtInt(filtered.length)} tickers · ${admin.label}`
-            : `${fmtInt(filtered.length)} of ${fmtInt(tickers.length)}`
-        }
+        subtitle={`${fmtInt(filtered.length)} of ${fmtInt(tickers.length)}`}
         right={
           <input
             type="text"
@@ -125,11 +78,6 @@ export default function TickersPage({ data }) {
       )}
 
       <div className="flex flex-wrap items-center gap-1.5 mb-4">
-        <Segmented
-          value={qs.admin}
-          onChange={(v) => setQs({ admin: v })}
-          options={ADMINISTRATIONS.map((a) => ({ k: a.k, label: a.short }))}
-        />
         <Segmented
           value={qs.sort}
           onChange={(v) => setQs({ sort: v })}

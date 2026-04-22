@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { FilerAvatar, SampleChip } from "../components/TablePrimitives";
 import { navigate, useQueryState } from "../router";
-import { ADMINISTRATIONS, Card, fmtInt, fmtUSD, SectionHeader, TABLE_HEADER_CLS, TABLE_ZEBRA_CLS } from "../ui";
+import { Card, fmtInt, fmtUSD, SectionHeader, TABLE_HEADER_CLS } from "../ui";
 
 const SORTS = {
   trades: { label: "Most trades", fn: (a, b) => b.trade_count - a.trade_count },
@@ -25,11 +25,10 @@ function matchBranch(f, k) {
 
 export default function FilersPage({ data }) {
   const { filers = [], returns = [] } = data;
-  const [qs, setQs] = useQueryState(["q", "sort", "branch", "admin"], {
+  const [qs, setQs] = useQueryState(["q", "sort", "branch"], {
     q: "",
     sort: "trades",
     branch: "all",
-    admin: "all",
   });
 
   // Merge returns into filers by id for sorting / display
@@ -45,7 +44,6 @@ export default function FilersPage({ data }) {
     const q = qs.q.toLowerCase().trim();
     let list = enrichedFilers.filter((f) => {
       if (!matchBranch(f, qs.branch)) return false;
-      if (qs.admin !== "all" && !(f.admins || []).includes(qs.admin)) return false;
       if (!q) return true;
       return (
         (f.full_name || "").toLowerCase().includes(q) ||
@@ -76,11 +74,6 @@ export default function FilersPage({ data }) {
       />
 
       <div className="flex flex-wrap items-center gap-1.5 mb-4">
-        <Segmented
-          value={qs.admin}
-          onChange={(v) => setQs({ admin: v })}
-          options={ADMINISTRATIONS.map((a) => ({ k: a.k, label: a.short }))}
-        />
         <Segmented value={qs.branch} onChange={(v) => setQs({ branch: v })} options={BRANCH_FILTERS} />
         <Segmented
           value={qs.sort}
