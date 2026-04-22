@@ -1,65 +1,16 @@
-import React, { useMemo } from "react";
+import React from "react";
 import CabinetSpotlight from "../components/CabinetSpotlight";
 import LeaderboardRail from "../components/LeaderboardRail";
 import ReturnsLeaderboard from "../components/ReturnsLeaderboard";
 import LateLeaderboard from "../LateLeaderboard";
-import { useQueryState } from "../router";
 import TickerBoard from "../TickerBoard";
-import { ADMINISTRATIONS, findAdmin, fmtInt, Link, SectionHeader, Segmented } from "../ui";
+import { fmtInt, Link, SectionHeader } from "../ui";
 
 export default function OverviewPage({ data }) {
-  const {
-    stats,
-    filers,
-    tickers,
-    scatter,
-    trades = [],
-    returns = [],
-    prices = {},
-    adminStats = {},
-  } = data;
-  const [qs, setQs] = useQueryState(["admin"], { admin: "all" });
-  const admin = findAdmin(qs.admin);
-  const adminActive = admin.k !== "all";
-  const adminStat = adminActive ? adminStats[admin.k] : null;
+  const { stats, filers, tickers, trades = [], returns = [], prices = {} } = data;
 
-  // When admin is scoped we rely on server-side pre-aggregates (admin-stats.json).
-  // The client-side filter path fails for pre-2024 admins because trades.json is
-  // capped at 5,000 recent rows — filtering to Trump I returned empty. Pre-computing
-  // everything on the server avoids shipping all 54k rows to the browser.
-  const scoped = useMemo(() => {
-    if (!adminActive) return { trades, filers, tickers, scatter };
-    if (!adminStat) return { trades: [], filers: [], tickers: [], scatter: { filers: [], trades: [] } };
-
-    // topByLate has its own pre-ranked list sorted by late-share-weighted-by-count;
-    // topByTrades is the generic "most active" list. Merge by id so LateLeaderboard
-    // (which expects filers with `late_filings` + `trade_count`) gets a usable pool.
-    const byId = new Map();
-    for (const f of adminStat.topByTrades) byId.set(f.id, f);
-    for (const f of adminStat.topByLate) byId.set(f.id, { ...byId.get(f.id), ...f });
-    const scopedFilers = [...byId.values()];
-    const scopedTickers = adminStat.topTickers;
-
-    return {
-      trades: [], // scoped-trade iteration no longer needed here
-      filers: scopedFilers,
-      tickers: scopedTickers,
-      scatter: { filers: [], trades: [] },
-      lateCount: adminStat.late,
-      volume: adminStat.volume,
-      tradesCount: adminStat.trades,
-      filersCount: adminStat.filers,
-      biggestTrade: adminStat.biggestTrade,
-    };
-  }, [trades, filers, tickers, scatter, admin, adminActive, adminStat]);
-
-  const headline = adminActive
-    ? `What is ${admin.label === "Trump I" ? "Trump I's" : admin.label === "Trump II" ? "Trump II's" : admin.label === "Biden" ? "Biden's" : "Obama's"} cohort trading?`
-    : "Monitor Congressional stock trades";
-
-  const subline = adminActive
-    ? `${fmtInt(scoped.tradesCount)} transactions from ${fmtInt(scoped.filersCount)} officials · ${admin.start.slice(0, 7)} → ${admin.end ? admin.end.slice(0, 7) : "now"}`
-    : `${fmtInt(stats?.totalTrades)} transactions from ${fmtInt(stats?.totalFilers)} members of Congress and senior executive branch officials, parsed directly from the Clerk of the House, OGE, and Senate eFD.`;
+  const headline = "Monitor Congressional stock trades";
+  const subline = `${fmtInt(stats?.totalTrades)} transactions from ${fmtInt(stats?.totalFilers)} members of Congress and senior executive branch officials, parsed directly from the Clerk of the House, OGE, and Senate eFD.`;
 
   return (
     <>
@@ -71,36 +22,16 @@ export default function OverviewPage({ data }) {
           <p className="text-regular text-ink_muted">{subline}</p>
         </div>
 
-        <div className="mt-6">
-          <Segmented
-            value={admin.k}
-            onChange={(k) => setQs({ admin: k })}
-            options={ADMINISTRATIONS.map((a) => ({ k: a.k, label: a.short }))}
-          />
-        </div>
-
-        {/* Leaderboard rail: 5 editorial highlights. Responds to admin scope. */}
-        <div className="mt-6">
-          <LeaderboardRail
-            filers={adminActive ? scoped.filers : filers}
-            returns={returns}
-            tickers={adminActive ? scoped.tickers : tickers}
-            trades={trades}
-            prices={prices}
-            adminKey={admin.k}
-            adminStat={adminStat}
-          />
+        <div className="mt-8">
+          <LeaderboardRail filers={filers} returns={returns} tickers={tickers} trades={trades} prices={prices} />
         </div>
       </section>
 
-      {/* Cabinet spotlight: executive-branch activity under the current admin */}
-      {!adminActive && (
-        <section className="max-w-[1440px] mx-auto px-4 sm:px-6 pb-14">
-          <CabinetSpotlight filers={filers} trades={trades} />
-        </section>
-      )}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 pb-14">
+        <CabinetSpotlight filers={filers} trades={trades} />
+      </section>
 
-      {returns && returns.length > 0 && !adminActive && (
+      {returns && returns.length > 0 && (
         <section className="max-w-[1440px] mx-auto px-4 sm:px-6 pb-14">
           <SectionHeader
             title="Biggest outperformers"
@@ -120,29 +51,23 @@ export default function OverviewPage({ data }) {
           <SectionHeader
             title="Most late filings"
             right={
-              <Link
-                to={`/filers?sort=late${adminActive ? `&admin=${admin.k}` : ""}`}
-                className="text-small no-underline hover:no-underline"
-              >
+              <Link to="/filers?sort=late" className="text-small no-underline hover:no-underline">
                 See all →
               </Link>
             }
           />
-          <LateLeaderboard filers={adminActive ? scoped.filers : filers} />
+          <LateLeaderboard filers={filers} />
         </div>
         <div>
           <SectionHeader
             title="Most traded tickers"
             right={
-              <Link
-                to={`/tickers${adminActive ? `?admin=${admin.k}` : ""}`}
-                className="text-small no-underline hover:no-underline"
-              >
+              <Link to="/tickers" className="text-small no-underline hover:no-underline">
                 See all →
               </Link>
             }
           />
-          <TickerBoard tickers={(adminActive ? scoped.tickers : tickers).slice(0, 15)} prices={prices} />
+          <TickerBoard tickers={tickers.slice(0, 15)} prices={prices} />
         </div>
       </section>
     </>
