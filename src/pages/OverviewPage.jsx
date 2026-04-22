@@ -2,7 +2,7 @@ import React from "react";
 import CabinetSpotlight from "../components/CabinetSpotlight";
 import LeaderboardRail from "../components/LeaderboardRail";
 import ReturnsLeaderboard from "../components/ReturnsLeaderboard";
-import LateLeaderboard from "../LateLeaderboard";
+import LatestActivity from "../components/LatestActivity";
 import TickerBoard from "../TickerBoard";
 import { fmtInt, Link, SectionHeader } from "../ui";
 
@@ -49,14 +49,14 @@ export default function OverviewPage({ data }) {
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 pb-20 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <SectionHeader
-            title="Most late filings"
+            title="Latest activity"
             right={
-              <Link to="/filers?sort=late" className="text-small no-underline hover:no-underline">
+              <Link to="/trades" className="text-small no-underline hover:no-underline">
                 See all →
               </Link>
             }
           />
-          <LateLeaderboard filers={filers} />
+          <LatestActivity trades={trades} />
         </div>
         <div>
           <SectionHeader
