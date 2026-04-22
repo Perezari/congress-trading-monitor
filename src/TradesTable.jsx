@@ -97,17 +97,6 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
 
   const displayed = sortedTrades.slice(0, pageSize);
 
-  // Scale the amount bar against the largest visible midpoint so rows become
-  // directly comparable — the bar length is the story, the number is the audit.
-  const maxMidpoint = useMemo(() => {
-    let m = 0;
-    for (const t of displayed) {
-      const mid = midpoint(t);
-      if (mid && mid > m) m = mid;
-    }
-    return m || 1;
-  }, [displayed]);
-
   const toggleSort = (k) => {
     if (col.key === k) setCol({ key: k, dir: col.dir === "asc" ? "desc" : "asc" });
     else setCol({ key: k, dir: "desc" });
@@ -143,7 +132,6 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
             )}
             {displayed.map((t) => {
               const mid = midpoint(t);
-              const barPct = mid ? Math.min(100, (mid / maxMidpoint) * 100) : 0;
               const assetTag = assetTypeTag(t.asset_type);
               const tt = (t.transaction_type || "").toLowerCase();
               const isBuy = tt.includes("urchase") || tt === "p" || /^p($|\s|\()/.test(tt);
@@ -216,15 +204,12 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                     {sideLabel}
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 tabular-nums" title={t.amount_range_label ?? ""}>
-                    <div className="h-[3px] flex-1 max-w-[96px] rounded-full bg-stroke overflow-hidden">
-                      <div
-                        className={`h-full ${isBuy ? "bg-buy" : isSell ? "bg-sell" : "bg-accent"} opacity-70`}
-                        style={{ width: `${barPct}%` }}
-                      />
-                    </div>
-                    <span className="text-ink min-w-[56px] text-right">{mid != null ? fmtUSD(mid) : "--"}</span>
-                  </div>
+                  <span
+                    className="text-right text-ink tabular-nums"
+                    title={t.amount_range_label ?? ""}
+                  >
+                    {mid != null ? fmtUSD(mid) : "--"}
+                  </span>
 
                   <div className="text-right text-ink_muted tabular-nums font-mono">{t.transaction_date ?? "--"}</div>
 

@@ -221,8 +221,6 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
   }
 
   const meta = branchPill(filer);
-  const netBiasPct = stats.count ? ((stats.buys - stats.sells) / stats.count) * 100 : 0;
-  const onTimePct = stats.count ? (1 - stats.late / stats.count) * 100 : 100;
   const coverageStart = stats.earliest?.slice(0, 7);
   const coverageEnd = stats.latest?.slice(0, 7);
 
@@ -276,7 +274,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
         )}
       </div>
 
-      <ImaginaryPortfolio trades={trades} stats={stats} netBiasPct={netBiasPct} onTimePct={onTimePct} />
+      <ImaginaryPortfolio trades={trades} />
 
       {stats.weightedExcess != null && stats.alphaDrivers && stats.alphaDrivers.length > 0 && (
         <AlphaDriversSection drivers={stats.alphaDrivers} weightedExcess={stats.weightedExcess} />
@@ -320,17 +318,16 @@ function BranchDotPill({ filer }) {
 
 // Performance by ticker: net contribution to weighted alpha per symbol.
 // Quant desks want to see: 'is alpha from one lucky name or broad-based?'
-const TICKER_GRID = "36px 96px 76px 120px 100px 140px 140px";
+const TICKER_GRID = "36px 96px 76px 120px 100px 140px 96px";
 
 function TickerAttributionSection({ rows, prices = {} }) {
   const top = rows.slice(0, 15);
-  const maxAbs = Math.max(...top.map((r) => Math.abs(r.contribSum)), 1);
   return (
     <div className="mb-10">
       <SectionHeader title="Performance by ticker" subtitle="Per-ticker contribution to weighted alpha" />
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
-        <div className="min-w-[820px]">
+        <div className="min-w-[720px]">
         <div
           className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
           style={{ gridTemplateColumns: TICKER_GRID }}
@@ -346,9 +343,6 @@ function TickerAttributionSection({ rows, prices = {} }) {
         <div className="divide-y divide-stroke_soft">
           {top.map((r, i) => {
             const alpha = r.tickerAlpha;
-            const contrib = r.contribSum;
-            const barPct = Math.min(100, (Math.abs(contrib) / maxAbs) * 100);
-            const barColor = contrib >= 0 ? "bg-buy" : "bg-sell";
             const p = prices[r.ticker];
             const change =
               p?.latest && p?.previous ? ((p.latest.close - p.previous.close) / p.previous.close) * 100 : null;
@@ -393,17 +387,12 @@ function TickerAttributionSection({ rows, prices = {} }) {
                 >
                   {alpha == null ? "—" : `${alpha >= 0 ? "+" : ""}${alpha.toFixed(0)}%`}
                 </span>
-                <div className="flex items-center justify-end gap-2 tabular-nums">
-                  <div className="h-[3px] w-[72px] rounded-full bg-stroke overflow-hidden">
-                    <div className={`h-full ${barColor} opacity-80`} style={{ width: `${barPct}%` }} />
-                  </div>
-                  <span
-                    className={`text-mini min-w-[42px] text-right ${r.signedContribShare >= 0 ? "text-buy" : "text-sell"}`}
-                  >
-                    {r.signedContribShare >= 0 ? "+" : ""}
-                    {r.signedContribShare.toFixed(0)}%
-                  </span>
-                </div>
+                <span
+                  className={`text-right text-mini tabular-nums ${r.signedContribShare >= 0 ? "text-buy" : "text-sell"}`}
+                >
+                  {r.signedContribShare >= 0 ? "+" : ""}
+                  {r.signedContribShare.toFixed(0)}%
+                </span>
               </button>
             );
           })}
@@ -537,7 +526,7 @@ function AlphaDriversSection({ drivers, weightedExcess }) {
 // every disclosed buy to today's close. Reframes the hold-to-today methodology
 // as a feature rather than a caveat — "If Marshall never sold his 2017 NVDA,
 // he'd have a $3M tech portfolio today." The math is mid_amount × ret_since.
-function ImaginaryPortfolio({ trades, stats, netBiasPct, onTimePct }) {
+function ImaginaryPortfolio({ trades }) {
   const data = useMemo(() => {
     const buys = trades.filter((t) => {
       const tt = (t.transaction_type || "").toLowerCase();
@@ -596,7 +585,7 @@ function ImaginaryPortfolio({ trades, stats, netBiasPct, onTimePct }) {
 
   if (!data) return null;
 
-  const HOLDINGS_GRID = "32px minmax(140px,1fr) 90px 110px 130px 90px 150px";
+  const HOLDINGS_GRID = "32px minmax(140px,1fr) 90px 110px 130px 90px 72px";
 
   return (
     <div className="mb-10">
@@ -645,53 +634,9 @@ function ImaginaryPortfolio({ trades, stats, netBiasPct, onTimePct }) {
             <div className="text-mini text-ink_faint mt-1.5">{fmtInt(data.scoredBuys)} buys scored</div>
           </div>
         </div>
-        {stats && (
-          <div className="mt-5 pt-4 border-t border-stroke_soft text-small text-ink_muted flex flex-wrap items-center gap-x-5 gap-y-1 tabular-nums">
-            <span>
-              <span className="text-ink font-medium">{fmtInt(stats.count)}</span> trades
-              <span className="text-ink_faint">
-                {" "}
-                ({fmtInt(stats.buys)} / {fmtInt(stats.sells)})
-              </span>
-            </span>
-            <span>
-              <span className="text-ink font-medium">{fmtUSD(stats.volume)}</span> deployed
-            </span>
-            {stats.hitRate != null && (
-              <span>
-                Hit rate{" "}
-                <span className={`font-medium ${stats.hitRate >= 0.5 ? "text-buy" : "text-sell"}`}>
-                  {(stats.hitRate * 100).toFixed(0)}%
-                </span>
-              </span>
-            )}
-            {netBiasPct != null && (
-              <span>
-                Net bias{" "}
-                <span
-                  className={`font-medium ${netBiasPct > 0 ? "text-buy" : netBiasPct < 0 ? "text-sell" : "text-ink"}`}
-                >
-                  {netBiasPct === 0
-                    ? "Neutral"
-                    : netBiasPct > 0
-                      ? `+${netBiasPct.toFixed(0)}%`
-                      : `${netBiasPct.toFixed(0)}%`}
-                </span>
-              </span>
-            )}
-            {onTimePct != null && (
-              <span>
-                On-time{" "}
-                <span className={`font-medium ${onTimePct >= 80 ? "text-ink" : "text-warn"}`}>
-                  {onTimePct.toFixed(0)}%
-                </span>
-              </span>
-            )}
-          </div>
-        )}
       </Card>
 
-      <Card className="overflow-hidden mt-4">
+      <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <div className="min-w-[760px]">
             <div
@@ -732,12 +677,7 @@ function ImaginaryPortfolio({ trades, stats, netBiasPct, onTimePct }) {
                     {p.gain >= 0 ? "+" : ""}
                     {p.gainPct.toFixed(0)}%
                   </span>
-                  <div className="flex items-center justify-end gap-2 tabular-nums">
-                    <div className="h-[3px] w-[72px] rounded-full bg-stroke overflow-hidden">
-                      <div className="h-full bg-accent opacity-70" style={{ width: `${p.weight}%` }} />
-                    </div>
-                    <span className="text-mini min-w-[34px] text-right text-ink_muted">{p.weight.toFixed(0)}%</span>
-                  </div>
+                  <span className="tabular-nums text-right text-ink_muted">{p.weight.toFixed(0)}%</span>
                 </button>
               ))}
             </div>
