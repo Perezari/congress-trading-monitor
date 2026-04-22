@@ -45,6 +45,29 @@ function SortIndicator({ active, dir }) {
   );
 }
 
+// Owner code chip: STOCK Act filings label who in the household the trade
+// belongs to. SP = spouse, DC = dependent child, JT = joint, DJ = dependent
+// joint. If it's blank or "self", don't render a chip (that's the default).
+const OWNER_LABELS = {
+  SP: { label: "SP", title: "Trade by spouse" },
+  DC: { label: "DC", title: "Trade by dependent child" },
+  JT: { label: "JT", title: "Joint account" },
+  DJ: { label: "DJ", title: "Dependent joint account" },
+};
+
+function OwnerChip({ owner }) {
+  const meta = owner ? OWNER_LABELS[owner.toUpperCase?.()] : null;
+  if (!meta) return null;
+  return (
+    <span
+      className="shrink-0 inline-flex items-center px-[5px] h-[15px] rounded-[3px] bg-accent_bg text-accent text-[0.625rem] font-semibold tabular-nums"
+      title={meta.title}
+    >
+      {meta.label}
+    </span>
+  );
+}
+
 function assetTypeTag(type) {
   if (!type) return null;
   const t = String(type).toUpperCase();
@@ -163,7 +186,10 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                       size={24}
                     />
                     <div className="min-w-0">
-                      <div className="text-ink font-medium truncate hover:text-accent">{t.filer_name}</div>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="text-ink font-medium truncate hover:text-accent">{t.filer_name}</span>
+                        <OwnerChip owner={t.owner} />
+                      </div>
                       <div className="text-mini text-ink_muted truncate mt-[1px]">
                         {t.chamber
                           ? `${t.chamber === "senate" ? "Senate" : "House"} · ${t.party ?? "-"}${t.state ? ` · ${t.state}` : ""}`

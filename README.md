@@ -37,6 +37,11 @@ Open [http://localhost:5183](http://localhost:5183)
 
 All data is served as static JSON in `public/data/` and loaded client-side. No backend required.
 
+## Data sources
+
+All data is parsed from publicly available STOCK Act disclosures — the House Clerk's Financial Disclosure portal, the Senate eFD system, and the Office of Government Ethics for the executive branch. These are public records under the Ethics in Government Act.
+
+We use [kadoa.com](https://kadoa.com) to collect, parse, and normalize the filings at scale. Need the full historical dataset with continuous updates? [Get in touch](https://www.kadoa.com/contact/sales).
 
 ## What's next
 

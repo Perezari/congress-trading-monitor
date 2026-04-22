@@ -318,7 +318,7 @@ function BranchDotPill({ filer }) {
 
 // Performance by ticker: net contribution to weighted alpha per symbol.
 // Quant desks want to see: 'is alpha from one lucky name or broad-based?'
-const TICKER_GRID = "36px minmax(96px,1fr) 76px 120px 100px 140px 96px";
+const TICKER_GRID = "36px 110px 80px 120px 110px 140px minmax(96px,1fr)";
 
 function TickerAttributionSection({ rows, prices = {} }) {
   const top = rows.slice(0, 15);
