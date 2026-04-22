@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { FilerAvatar, SampleChip } from "../components/TablePrimitives";
 import { navigate, useQueryState } from "../router";
-import { ADMINISTRATIONS, Card, fmtInt, fmtUSD, Pill, SectionHeader, TABLE_HEADER_CLS, TABLE_ZEBRA_CLS } from "../ui";
+import { ADMINISTRATIONS, Card, fmtInt, fmtUSD, SectionHeader, TABLE_HEADER_CLS, TABLE_ZEBRA_CLS } from "../ui";
 
 const SORTS = {
   trades: { label: "Most trades", fn: (a, b) => b.trade_count - a.trade_count },
@@ -132,12 +132,6 @@ function FilersTable({ filtered, sort, onClear }) {
           </div>
         )}
         {filtered.slice(0, 500).map((f, i) => {
-          const branch =
-            f.branch === "executive"
-              ? { tone: "amber", label: "Exec" }
-              : f.chamber === "senate"
-                ? { tone: "violet", label: "Senate" }
-                : { tone: "blue", label: "House" };
           const alpha = f.weighted_excess;
           return (
             <button
@@ -150,20 +144,12 @@ function FilersTable({ filtered, sort, onClear }) {
 
               <div className="flex items-center gap-2.5 min-w-0">
                 <FilerAvatar filer={f} size={32} />
-                <div className="min-w-0 flex-1">
-                  {/* Name + branch pill sit together at the left; empty space trails
-                      to the next column. Previous layout gave the name flex-1 which
-                      pushed the pill all the way right, making it look detached. */}
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="text-small text-ink font-medium truncate">{f.full_name}</span>
-                    <Pill tone={branch.tone} size="xs">
-                      {branch.label}
-                    </Pill>
-                  </div>
+                <div className="min-w-0">
+                  <div className="text-small text-ink font-medium truncate">{f.full_name}</div>
                   <div className="text-mini text-ink_muted truncate mt-[1px]">
                     {f.branch === "executive"
-                      ? `${f.level ?? ""} ${f.agency ?? ""}`.trim()
-                      : `${f.party ?? "-"} · ${f.state ?? "-"}`}
+                      ? `${f.level ?? ""} ${f.agency ?? ""}`.trim() || "Executive"
+                      : `${f.chamber === "senate" ? "Senate" : "House"} · ${f.party ?? "-"} · ${f.state ?? "-"}`}
                   </div>
                 </div>
               </div>
