@@ -156,15 +156,6 @@ function buildCategories(trades) {
   }
   return [
     {
-      key: "search",
-      label: "Search",
-      icon: icon.search,
-      kind: "text",
-      placeholder: "Ticker, filer, asset…",
-      emptyValue: "",
-      renderValue: (v) => (v ? `"${v}"` : null),
-    },
-    {
       key: "source",
       label: "Source",
       icon: icon.source,
@@ -256,8 +247,15 @@ export default function FilterBar({ filters, setFilters, trades }) {
   const [open, setOpen] = useState(null); // { anchor: 'add' | chip_key, initialQuery?: string }
   const clearAll = () => setFilters({ ...defaultFilters });
 
+  const anyApplied = appliedKeys.length > 0 || (filters.search ?? "") !== "";
+
   return (
     <div className="flex flex-wrap items-center gap-1.5">
+      <InlineSearch
+        value={filters.search ?? ""}
+        onChange={(v) => setFilters((prev) => ({ ...prev, search: v }))}
+      />
+
       {appliedKeys.map((k) => (
         <FilterChip
           key={k}
@@ -279,7 +277,7 @@ export default function FilterBar({ filters, setFilters, trades }) {
         setOpen={(o) => setOpen(o ? "__add" : null)}
       />
 
-      {appliedKeys.length > 0 && (
+      {anyApplied && (
         <button
           onClick={clearAll}
           className="ml-auto h-7 px-2 text-small text-ink_muted hover:text-ink transition-colors"
@@ -287,6 +285,23 @@ export default function FilterBar({ filters, setFilters, trades }) {
           Clear
         </button>
       )}
+    </div>
+  );
+}
+
+function InlineSearch({ value, onChange }) {
+  return (
+    <div className="relative">
+      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-ink_faint pointer-events-none">
+        {icon.search}
+      </span>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Search ticker, filer, asset…"
+        className="h-7 w-[220px] pl-7 pr-2 text-small bg-panel border border-stroke rounded-md placeholder:text-ink_faint text-ink focus:outline-none focus:ring-2 focus:ring-accent/25 focus:border-accent/40"
+      />
     </div>
   );
 }
