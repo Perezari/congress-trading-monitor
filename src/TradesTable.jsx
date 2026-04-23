@@ -225,9 +225,14 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
 
                   <div
                     className={`font-medium uppercase tracking-[0.02em] text-mini ${isBuy ? "text-buy" : isSell ? "text-sell" : "text-ink_muted"}`}
-                    title={t.transaction_type}
+                    title={
+                      t.comment
+                        ? `${t.transaction_type}\n\nNote from filing: ${t.comment}`
+                        : t.transaction_type
+                    }
                   >
                     {sideLabel}
+                    {t.comment && <span className="text-ink_muted ml-[1px]">*</span>}
                   </div>
 
                   <span
