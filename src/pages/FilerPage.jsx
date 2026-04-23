@@ -304,7 +304,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
       )}
 
       <div className="mb-10">
-        <SectionHeader title="Trade rhythm" />
+        <SectionHeader title="Timeline" />
         <Card className="p-4">
           <PersonalTimeline trades={trades} />
         </Card>

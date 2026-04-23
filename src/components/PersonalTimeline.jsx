@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
 export default function PersonalTimeline({ trades, highlightTicker = null }) {
   const ref = useRef(null);
