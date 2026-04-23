@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, fmtInt, Link } from "../ui";
+import { Card } from "../ui";
 
 const STEPS = [
   {
@@ -43,8 +43,26 @@ export default function AboutPage({ data }) {
         <h1 className="text-display font-semibold leading-[1.08] tracking-[-0.016em] text-ink mb-4">About the data</h1>
         <p className="text-regular text-ink_muted">
           An open dataset that parses congressional and executive branch financial disclosures into a searchable,
-          sortable, visual format. Every transaction links back to the original filing PDF so any claim on this site can
-          be verified against the source document.
+          sortable, visual format. Filings are sourced and monitored with{" "}
+          <a
+            href="https://kadoa.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline"
+          >
+            kadoa.com
+          </a>
+          {" "}and code is open source on{" "}
+          <a
+            href="https://github.com/kadoa-org/congress-trading-monitor"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline"
+          >
+            GitHub
+          </a>
+          . Every transaction links back to the original filing PDF so any claim on this site can be verified against
+          the source document.
         </p>
         {stats?.generatedAt && (
           <div className="mt-3 text-mini text-ink_muted flex items-center gap-2">
@@ -86,23 +104,7 @@ export default function AboutPage({ data }) {
       </div>
 
       <div className="mt-16 max-w-3xl text-small text-ink_muted">
-        <p>
-          For informational and journalism purposes only. Not investment advice. Dataset licensed for open use. Source
-          code on{" "}
-          <a
-            href="https://github.com/kadoa-org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-accent hover:underline"
-          >
-            GitHub
-          </a>
-          . Found a bug? File an issue or reach out via the{" "}
-          <Link to="/" className="underline">
-            home page
-          </Link>
-          .
-        </p>
+        <p>For informational and journalism purposes only. Not investment advice. Dataset licensed for open use.</p>
       </div>
     </div>
   );
