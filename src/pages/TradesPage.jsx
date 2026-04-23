@@ -4,7 +4,7 @@ import { useQueryState } from "../router";
 import TradesTable from "../TradesTable";
 import { fmtInt, SectionHeader } from "../ui";
 
-const FILTER_KEYS = ["q", "source", "type", "size", "late", "party", "state"];
+const FILTER_KEYS = ["q", "source", "type", "size", "late", "party", "state", "asset"];
 const QUERY_DEFAULTS = {
   q: "",
   source: "all",
@@ -13,6 +13,7 @@ const QUERY_DEFAULTS = {
   late: "all",
   party: "all",
   state: "all",
+  asset: "all",
 };
 
 // Adapt URL query state to FilterBar's filter object (which uses "search" not "q")
@@ -26,6 +27,7 @@ function toFilters(qs) {
     late: qs.late,
     party: qs.party,
     state: qs.state,
+    asset: qs.asset,
   };
 }
 
@@ -46,6 +48,7 @@ export default function TradesPage({ data }) {
         late: merged.late,
         party: merged.party,
         state: merged.state,
+        asset: merged.asset,
       };
     });
   };
@@ -82,6 +85,7 @@ export default function TradesPage({ data }) {
         late: "Late",
         party: "Party",
         state: "State",
+        asset: "Asset",
       }[k];
       activeChips.push({ k, label, value: qs[k] });
     }

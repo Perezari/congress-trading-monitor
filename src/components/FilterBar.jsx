@@ -23,7 +23,8 @@ export default function FilterBar({ filters, setFilters, trades }) {
     (filters.size !== "all" ? 1 : 0) +
     (filters.late !== "all" ? 1 : 0) +
     (filters.party !== "all" ? 1 : 0) +
-    (filters.state !== "all" ? 1 : 0);
+    (filters.state !== "all" ? 1 : 0) +
+    (filters.asset && filters.asset !== "all" ? 1 : 0);
   const [showAdvanced, setShowAdvanced] = useState(advancedActiveCount > 0);
 
   return (
@@ -67,6 +68,14 @@ export default function FilterBar({ filters, setFilters, trades }) {
       </div>
       {showAdvanced && (
         <div className="flex flex-wrap items-center gap-2">
+          <Segmented
+            options={[
+              { k: "all", label: "All assets" },
+              { k: "public", label: "Publicly traded only" },
+            ]}
+            value={filters.asset ?? "all"}
+            onChange={set("asset")}
+          />
           <Segmented
             options={[
               { k: "all", label: "Any size" },
@@ -260,13 +269,52 @@ export const defaultFilters = {
   late: "all",
   party: "all",
   state: "all",
+  asset: "all",
 };
+
+// Asset-type buckets we treat as NOT publicly-traded equity. Drawn from raw
+// PTR/278-T asset_type values present in the dataset (26k "ST", 927 "Municipal
+// Security", 191 "Corporate Bond", 86 "Non-Public Stock", 146 "Commodities/
+// Futures Contract", etc.). Asset class of `CS` is a Corporate-Security /
+// bond flag on House PTRs, not common stock.
+const NON_PUBLIC_ASSET_TYPES = new Set([
+  "Municipal Security",
+  "Corporate Bond",
+  "Corporate Debt",
+  "Non-Public Stock",
+  "Non-Public Equity",
+  "Commodities/Futures Contract",
+  "Commodity",
+  "Futures",
+  "Cryptocurrency",
+  "CS", // House PTR corporate-bond tag
+  "AB", // Annuity
+  "HN", // Hedge fund
+  "BD", // Bond
+  "OL", // Oil / royalty
+  "GS", // Government security
+  "SA", // Savings account / non-market
+  "OT",
+  "Other",
+]);
+
+export function isPubliclyTraded(t) {
+  // Require a ticker (no ticker -> no public equity identity) AND an asset_type
+  // that isn't explicitly in the non-public blocklist. Null asset_type passes
+  // through because many House PTR stock trades leave the type field blank but
+  // still carry a valid ticker.
+  if (!t.ticker) return false;
+  const at = t.asset_type;
+  if (!at) return true;
+  return !NON_PUBLIC_ASSET_TYPES.has(at);
+}
 
 export function applyFilters(trades, filters) {
   return trades.filter((t) => {
     if (filters.source !== "all" && t.source_id !== filters.source) return false;
     if (filters.party !== "all" && t.party !== filters.party) return false;
     if (filters.state !== "all" && t.state !== filters.state) return false;
+    if (filters.asset === "public" && !isPubliclyTraded(t)) return false;
     if (filters.type !== "all") {
       const tt = (t.transaction_type || "").toLowerCase();
       const isBuy = tt.includes("urchase") || tt === "p";
