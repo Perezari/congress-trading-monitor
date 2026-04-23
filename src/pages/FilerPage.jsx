@@ -137,6 +137,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
           id: t.id,
           ticker: t.ticker,
           asset_name: t.asset_name,
+          comment: t.comment,
           transaction_date: t.transaction_date,
           mid,
           excess: t.excess_since,
@@ -490,9 +491,16 @@ function AlphaDriversSection({ drivers }) {
                 >
                   {d.ticker ? <TickerLabel ticker={d.ticker} size="sm" /> : <span className="text-ink_faint">—</span>}
                 </button>
-                <span className="text-ink_muted truncate" title={d.asset_name}>
-                  {cleanAssetName(d.asset_name)}
-                </span>
+                <div className="min-w-0">
+                  <div className="text-ink_muted truncate" title={d.asset_name}>
+                    {cleanAssetName(d.asset_name)}
+                  </div>
+                  {d.comment && (
+                    <div className="text-mini text-ink_faint truncate italic mt-[1px]" title={d.comment}>
+                      {d.comment}
+                    </div>
+                  )}
+                </div>
                 <span className="text-right text-ink_muted tabular-nums font-mono">{d.transaction_date}</span>
                 <span className="text-right text-ink_muted tabular-nums">{holdingLabel(d.transaction_date)}</span>
                 <span className="text-right text-ink tabular-nums">{fmtUSD(d.mid)}</span>
