@@ -27,7 +27,7 @@ function Metric({ label }) {
   );
 }
 
-export default function LeaderboardRail({ filers = [], returns = [], trades = [], prices = {} }) {
+export default function LeaderboardRail({ filers = [], returns = [], trades = [], prices = {}, stats = {} }) {
   const data = useMemo(() => {
     // Most active
     const topActive = [...filers].sort((a, b) => b.trade_count - a.trade_count)[0];
@@ -169,21 +169,20 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
         </Card>
       )}
 
-      {data.bestHitRate && (
-        <Card onClick={() => navigate(`/filer/${data.bestHitRate.id}`)}>
-          <Metric label="Best hit rate" />
-          <div className="flex items-center gap-2.5">
-            <FilerAvatar filer={data.bestHitRate} size={32} />
-            <div className="min-w-0 flex-1">
-              <div className="text-small font-medium text-ink truncate">{data.bestHitRate.full_name}</div>
-              <div className="text-mini tabular-nums">
-                <span className="text-buy font-semibold">{(data.bestHitRate.metric * 100).toFixed(0)}%</span>
-                <span className="text-ink_muted">
-                  {" "}
-                  · {data.bestHitRate.wins}/{data.bestHitRate.scored} beat SPY
-                </span>
-              </div>
-            </div>
+      {stats?.disclosureLag?.medianDaysToFile != null && (
+        <Card>
+          <Metric label="Disclosure lag" />
+          <div className="flex items-baseline gap-2">
+            <span className="text-[1rem] font-semibold text-ink tabular-nums">
+              {stats.disclosureLag.medianDaysToFile}d
+            </span>
+            <span className="text-mini text-ink_muted">median · 45d limit</span>
+          </div>
+          <div className="text-mini tabular-nums mt-1">
+            <span className="text-warn font-semibold">
+              {((stats.disclosureLag.lateCount / stats.disclosureLag.tradesWithLag) * 100).toFixed(0)}%
+            </span>
+            <span className="text-ink_muted"> filed after the deadline</span>
           </div>
         </Card>
       )}

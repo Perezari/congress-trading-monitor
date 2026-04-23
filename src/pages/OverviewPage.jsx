@@ -23,7 +23,14 @@ export default function OverviewPage({ data }) {
         </div>
 
         <div className="mt-8">
-          <LeaderboardRail filers={filers} returns={returns} tickers={tickers} trades={trades} prices={prices} />
+          <LeaderboardRail
+            filers={filers}
+            returns={returns}
+            tickers={tickers}
+            trades={trades}
+            prices={prices}
+            stats={stats}
+          />
         </div>
       </section>
 
