@@ -74,53 +74,13 @@ export default function TradesPage({ data }) {
     });
   }, [trades, filters, sortCol]);
 
-  const activeChips = [];
-  for (const k of FILTER_KEYS) {
-    if (qs[k] && qs[k] !== QUERY_DEFAULTS[k]) {
-      const label = {
-        q: "Search",
-        source: "Source",
-        type: "Type",
-        size: "Size",
-        late: "Late",
-        party: "Party",
-        state: "State",
-        asset: "Asset",
-      }[k];
-      activeChips.push({ k, label, value: qs[k] });
-    }
-  }
-
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 pt-8 pb-16">
       <SectionHeader title="All trades" subtitle={`${fmtInt(filtered.length)} of ${fmtInt(trades.length)}`} />
 
-      <div className="mb-3">
+      <div className="mb-4">
         <FilterBar filters={filters} setFilters={setFilters} trades={trades} />
       </div>
-
-      {activeChips.length > 0 && (
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="text-small text-ink_muted">Active:</span>
-          {activeChips.map((c) => (
-            <button
-              key={c.k}
-              onClick={() => setQs({ [c.k]: QUERY_DEFAULTS[c.k] })}
-              className="inline-flex items-center gap-1 px-2 h-6 rounded-full bg-muted text-small text-ink hover:bg-hover"
-            >
-              <span className="text-ink_muted">{c.label}:</span>
-              <span className="font-medium">{c.value}</span>
-              <span className="text-ink_faint ml-1">×</span>
-            </button>
-          ))}
-          <button
-            onClick={() => setQs({ ...QUERY_DEFAULTS })}
-            className="text-small text-ink_muted hover:text-ink ml-2"
-          >
-            Clear all
-          </button>
-        </div>
-      )}
 
       <TradesTable trades={filtered} tall sortCol={sortCol} onSort={setSortCol} filersById={filersById} />
     </div>
