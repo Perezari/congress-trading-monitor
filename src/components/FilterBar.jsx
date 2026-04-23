@@ -289,6 +289,124 @@ export default function FilterBar({ filters, setFilters, trades }) {
   );
 }
 
+// ---- Named exports for Filers/Tickers pages ----------------------------------
+
+export function InlineSearchInput({ value, onChange, placeholder = "Search…", width = 220 }) {
+  return (
+    <div className="relative">
+      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-ink_faint pointer-events-none">
+        {icon.search}
+      </span>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        style={{ width }}
+        className="h-7 pl-7 pr-2 text-small bg-panel border border-stroke rounded-md placeholder:text-ink_faint text-ink focus:outline-none focus:ring-2 focus:ring-accent/25 focus:border-accent/40"
+      />
+    </div>
+  );
+}
+
+// Linear-style single-select chip. Reuses the filter-chip look for cases where
+// a page has one small enum filter (e.g. chamber on the Filers page). Not
+// removable — the chip stays, its value cycles.
+export function SingleSelectChip({ label, icon: chipIcon, options, value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const btnRef = useRef(null);
+  const current = options.find((o) => o.k === value) ?? options[0];
+  return (
+    <div className="relative inline-flex items-stretch border border-stroke rounded-md bg-panel overflow-hidden h-7 text-small">
+      <span className="inline-flex items-center gap-1.5 pl-2 pr-1.5 text-ink_muted border-r border-stroke">
+        {chipIcon && <span className="text-ink_muted">{chipIcon}</span>}
+        <span className="font-medium text-ink">{label}</span>
+      </span>
+      <button
+        ref={btnRef}
+        onClick={() => setOpen((o) => !o)}
+        className="inline-flex items-center gap-1 px-2 text-ink hover:bg-muted transition-colors"
+      >
+        <span className="font-medium">{current.label}</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" className="text-ink_muted">
+          <path d="M2 4 L5 7 L8 4" />
+        </svg>
+      </button>
+      {open && (
+        <Popover anchor={btnRef} onClose={() => setOpen(false)}>
+          <div className="min-w-[180px] py-1">
+            {options.map((o) => (
+              <button
+                key={o.k}
+                onClick={() => {
+                  onChange(o.k);
+                  setOpen(false);
+                }}
+                className="w-full flex items-center gap-2 px-3 py-1.5 text-small text-left text-ink hover:bg-muted/70"
+              >
+                <span className="w-3 text-accent">{value === o.k ? icon.check : null}</span>
+                <span className="flex-1">{o.label}</span>
+              </button>
+            ))}
+          </div>
+        </Popover>
+      )}
+    </div>
+  );
+}
+
+// Sort control in the same chip idiom: "Sort | [current] ▾". Reuses Popover +
+// check-mark styling so Filers/Tickers stay visually consistent with Trades.
+export function SortButton({ options, value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const btnRef = useRef(null);
+  const current = options.find((o) => o.k === value) ?? options[0];
+  const sortIcon = (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6h13M3 12h9M3 18h5M17 14l4 4 4-4M21 18V6" />
+    </svg>
+  );
+  return (
+    <div className="relative inline-flex items-stretch border border-stroke rounded-md bg-panel overflow-hidden h-7 text-small">
+      <span className="inline-flex items-center gap-1.5 pl-2 pr-1.5 text-ink_muted border-r border-stroke">
+        <span className="text-ink_muted">{sortIcon}</span>
+        <span className="font-medium text-ink">Sort</span>
+      </span>
+      <button
+        ref={btnRef}
+        onClick={() => setOpen((o) => !o)}
+        className="inline-flex items-center gap-1 px-2 text-ink hover:bg-muted transition-colors"
+      >
+        <span className="font-medium">{current.label}</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" className="text-ink_muted">
+          <path d="M2 4 L5 7 L8 4" />
+        </svg>
+      </button>
+      {open && (
+        <Popover anchor={btnRef} onClose={() => setOpen(false)}>
+          <div className="min-w-[200px] py-1">
+            {options.map((o) => (
+              <button
+                key={o.k}
+                onClick={() => {
+                  onChange(o.k);
+                  setOpen(false);
+                }}
+                className="w-full flex items-center gap-2 px-3 py-1.5 text-small text-left text-ink hover:bg-muted/70"
+              >
+                <span className="w-3 text-accent">{value === o.k ? icon.check : null}</span>
+                <span className="flex-1">{o.label}</span>
+              </button>
+            ))}
+          </div>
+        </Popover>
+      )}
+    </div>
+  );
+}
+
+// ---- Internal: legacy inline search used by the main FilterBar ---------------
+
 function InlineSearch({ value, onChange }) {
   return (
     <div className="relative">

@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
+import { InlineSearchInput, SortButton } from "../components/FilterBar";
 import { TickerBadge, TickerLabel } from "../components/TickerBadge";
 import { navigate, useQueryState } from "../router";
-import { Card, fmtInt, fmtUSD, SectionHeader, Segmented, TABLE_HEADER_CLS } from "../ui";
+import { Card, fmtInt, fmtUSD, SectionHeader, TABLE_HEADER_CLS } from "../ui";
 
 const SORTS = {
   trades: { label: "Most trades", fn: (a, b) => b.trade_count - a.trade_count },
@@ -38,19 +39,7 @@ export default function TickersPage({ data }) {
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 pt-8 pb-16">
-      <SectionHeader
-        title="Tickers"
-        subtitle={`${fmtInt(filtered.length)} of ${fmtInt(tickers.length)}`}
-        right={
-          <input
-            type="text"
-            value={qs.q}
-            onChange={(e) => setQs({ q: e.target.value })}
-            placeholder="Filter ticker…"
-            className="h-8 w-[200px] pl-3 pr-3 text-small bg-panel border border-stroke rounded-md placeholder:text-ink_faint text-ink focus:outline-none focus:ring-2 focus:ring-accent/25 focus:border-accent/40 font-mono"
-          />
-        }
-      />
+      <SectionHeader title="Tickers" subtitle={`${fmtInt(filtered.length)} of ${fmtInt(tickers.length)}`} />
 
       {mostWidelyHeld.length > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
@@ -78,10 +67,16 @@ export default function TickersPage({ data }) {
       )}
 
       <div className="flex flex-wrap items-center gap-1.5 mb-4">
-        <Segmented
+        <InlineSearchInput
+          value={qs.q}
+          onChange={(v) => setQs({ q: v })}
+          placeholder="Filter ticker…"
+          width={200}
+        />
+        <SortButton
+          options={Object.entries(SORTS).map(([k, s]) => ({ k, label: s.label }))}
           value={qs.sort}
           onChange={(v) => setQs({ sort: v })}
-          options={Object.entries(SORTS).map(([k, s]) => ({ k, label: s.label }))}
         />
       </div>
 

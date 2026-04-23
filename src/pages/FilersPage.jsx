@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { InlineSearchInput, SingleSelectChip, SortButton } from "../components/FilterBar";
 import { FilerAvatar, SampleChip } from "../components/TablePrimitives";
 import { navigate, useQueryState } from "../router";
 import { Card, fmtInt, fmtUSD, SectionHeader, TABLE_HEADER_CLS } from "../ui";
@@ -60,25 +61,25 @@ export default function FilersPage({ data }) {
       <SectionHeader
         title="Filers"
         subtitle={`${fmtInt(filtered.length)} of ${fmtInt(enrichedFilers.length)}`}
-        right={
-          <div className="flex items-center gap-3">
-            <input
-              type="text"
-              value={qs.q}
-              onChange={(e) => setQs({ q: e.target.value })}
-              placeholder="Search name, state, agency…"
-              className="h-8 w-[240px] pl-3 pr-3 text-small bg-panel border border-stroke rounded-md placeholder:text-ink_faint text-ink focus:outline-none focus:ring-2 focus:ring-accent/25 focus:border-accent/40"
-            />
-          </div>
-        }
       />
 
       <div className="flex flex-wrap items-center gap-1.5 mb-4">
-        <Segmented value={qs.branch} onChange={(v) => setQs({ branch: v })} options={BRANCH_FILTERS} />
-        <Segmented
+        <InlineSearchInput
+          value={qs.q}
+          onChange={(v) => setQs({ q: v })}
+          placeholder="Search name, state, agency…"
+          width={240}
+        />
+        <SingleSelectChip
+          label="Chamber"
+          options={BRANCH_FILTERS}
+          value={qs.branch}
+          onChange={(v) => setQs({ branch: v })}
+        />
+        <SortButton
+          options={Object.entries(SORTS).map(([k, s]) => ({ k, label: s.label }))}
           value={qs.sort}
           onChange={(v) => setQs({ sort: v })}
-          options={Object.entries(SORTS).map(([k, s]) => ({ k, label: s.label }))}
         />
       </div>
 
