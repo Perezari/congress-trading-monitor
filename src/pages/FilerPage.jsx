@@ -269,28 +269,26 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
             </div>
           </div>
         </div>
-        <div className="flex items-baseline gap-5 text-ink_muted flex-wrap">
+        <div className="flex items-start gap-8 flex-wrap">
           {stats.medianLag != null && (
-            <div className="flex items-baseline gap-2" title={`${stats.late} of ${stats.count} filings were disclosed more than 45 days after the trade`}>
-              <span className="text-mini">Median lag</span>
-              <span className="text-[1.25rem] font-semibold tabular-nums text-ink">
-                {stats.medianLag}d
-              </span>
-              {stats.lateShare != null && stats.lateShare > 0 && (
-                <span className={`text-mini tabular-nums ${stats.lateShare >= 0.25 ? "text-warn" : "text-ink_muted"}`}>
-                  {(stats.lateShare * 100).toFixed(0)}% late
-                </span>
-              )}
-            </div>
+            <HeroStat
+              label="Median lag"
+              value={`${stats.medianLag}d`}
+              hint={
+                stats.lateShare != null && stats.lateShare > 0
+                  ? `${(stats.lateShare * 100).toFixed(0)}% late`
+                  : null
+              }
+              hintTone={stats.lateShare != null && stats.lateShare >= 0.25 ? "warn" : "muted"}
+              title={`${stats.late} of ${stats.count} filings were disclosed more than 45 days after the trade`}
+            />
           )}
           {peerContext?.rank != null && (
-            <div className="flex items-baseline gap-2">
-              <span className="text-mini">Outperformance rank</span>
-              <span className="text-[1.25rem] font-semibold tabular-nums text-ink">
-                #{peerContext.rank}
-                <span className="text-ink_muted text-regular">/{peerContext.total}</span>
-              </span>
-            </div>
+            <HeroStat
+              label="Outperformance rank"
+              value={`#${peerContext.rank}`}
+              hint={`of ${peerContext.total} ranked`}
+            />
           )}
         </div>
       </div>
@@ -317,6 +315,21 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
         <FilterBar filters={filters} setFilters={setFilters} trades={trades} />
       </div>
       <TradesTable trades={filtered} tall filersById={filersById} />
+    </div>
+  );
+}
+
+// Header stat block: uppercase tracked label, prominent tabular value, muted
+// hint. Matches the typographic rhythm of the ImaginaryPortfolio card.
+function HeroStat({ label, value, hint, hintTone = "muted", title }) {
+  const hintCls = hintTone === "warn" ? "text-warn" : "text-ink_muted";
+  return (
+    <div title={title}>
+      <div className="text-mini font-medium text-ink_muted uppercase tracking-[0.06em]">{label}</div>
+      <div className="mt-1 text-[1.375rem] font-semibold tabular-nums tracking-[-0.012em] leading-none text-ink">
+        {value}
+      </div>
+      {hint && <div className={`mt-1.5 text-mini tabular-nums ${hintCls}`}>{hint}</div>}
     </div>
   );
 }
