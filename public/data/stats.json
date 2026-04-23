@@ -14,5 +14,49 @@
     "oge_executive": 3226,
     "senate_efd": 8221
   },
-  "generatedAt": "2026-04-23T04:36:01.230Z"
+  "disclosureLag": {
+    "medianDaysToFile": 28,
+    "p90DaysToFile": 217,
+    "tradesWithLag": 52056,
+    "lateCount": 9937,
+    "buckets": [
+      {
+        "key": "0-15",
+        "label": "0-15d",
+        "count": 9756,
+        "late": false
+      },
+      {
+        "key": "15-30",
+        "label": "15-30d",
+        "count": 18005,
+        "late": false
+      },
+      {
+        "key": "30-45",
+        "label": "30-45d",
+        "count": 13689,
+        "late": false
+      },
+      {
+        "key": "45-90",
+        "label": "45-90d (late)",
+        "count": 3540,
+        "late": true
+      },
+      {
+        "key": "90-365",
+        "label": "90d-1y (late)",
+        "count": 3918,
+        "late": true
+      },
+      {
+        "key": "365+",
+        "label": "Over 1y (late)",
+        "count": 3148,
+        "late": true
+      }
+    ]
+  },
+  "generatedAt": "2026-04-23T05:54:38.230Z"
 }

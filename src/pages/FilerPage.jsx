@@ -43,6 +43,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
     let late = 0;
     let volume = 0;
     const byTicker = new Map();
+    const lagValues = [];
     let earliest = null;
     let latest = null;
     let excessSum = 0;
@@ -56,6 +57,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
       if (isBuy) buys++;
       else if (isSell) sells++;
       if (t.is_late) late++;
+      if (t.days_to_file != null && t.days_to_file >= 0) lagValues.push(t.days_to_file);
       const mid = t.amount_range_low && t.amount_range_high ? (t.amount_range_low + t.amount_range_high) / 2 : null;
       if (mid) volume += mid;
       if (t.ticker) {
@@ -146,6 +148,8 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
       }
       alphaDrivers.sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
     }
+    const sortedLag = [...lagValues].sort((a, b) => a - b);
+    const medianLag = sortedLag.length ? sortedLag[Math.floor((sortedLag.length - 1) * 0.5)] : null;
     return {
       buys,
       sells,
@@ -161,6 +165,8 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
       wins,
       hitRate,
       alphaDrivers,
+      medianLag,
+      lateShare: lagValues.length ? late / lagValues.length : null,
     };
   }, [trades]);
 
@@ -263,15 +269,30 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
             </div>
           </div>
         </div>
-        {peerContext?.rank != null && (
-          <div className="flex items-baseline gap-2 text-ink_muted">
-            <span className="text-mini ">Outperformance rank</span>
-            <span className="text-[1.25rem] font-semibold tabular-nums text-ink">
-              #{peerContext.rank}
-              <span className="text-ink_muted text-regular">/{peerContext.total}</span>
-            </span>
-          </div>
-        )}
+        <div className="flex items-baseline gap-5 text-ink_muted flex-wrap">
+          {stats.medianLag != null && (
+            <div className="flex items-baseline gap-2" title={`${stats.late} of ${stats.count} filings were disclosed more than 45 days after the trade`}>
+              <span className="text-mini">Median lag</span>
+              <span className="text-[1.25rem] font-semibold tabular-nums text-ink">
+                {stats.medianLag}d
+              </span>
+              {stats.lateShare != null && stats.lateShare > 0 && (
+                <span className={`text-mini tabular-nums ${stats.lateShare >= 0.25 ? "text-warn" : "text-ink_muted"}`}>
+                  {(stats.lateShare * 100).toFixed(0)}% late
+                </span>
+              )}
+            </div>
+          )}
+          {peerContext?.rank != null && (
+            <div className="flex items-baseline gap-2">
+              <span className="text-mini">Outperformance rank</span>
+              <span className="text-[1.25rem] font-semibold tabular-nums text-ink">
+                #{peerContext.rank}
+                <span className="text-ink_muted text-regular">/{peerContext.total}</span>
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       <ImaginaryPortfolio trades={trades} />

@@ -1,5 +1,6 @@
 import React from "react";
 import CabinetSpotlight from "../components/CabinetSpotlight";
+import DisclosureLag from "../components/DisclosureLag";
 import LeaderboardRail from "../components/LeaderboardRail";
 import ReturnsLeaderboard from "../components/ReturnsLeaderboard";
 import LatestActivity from "../components/LatestActivity";
@@ -30,6 +31,8 @@ export default function OverviewPage({ data }) {
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 pb-14">
         <CabinetSpotlight filers={filers} trades={trades} />
       </section>
+
+      <DisclosureLag disclosureLag={stats?.disclosureLag} />
 
       {returns && returns.length > 0 && (
         <section className="max-w-[1440px] mx-auto px-4 sm:px-6 pb-14">
