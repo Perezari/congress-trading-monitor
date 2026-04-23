@@ -282,10 +282,10 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="text-ink_muted hover:text-accent text-mini tabular-nums"
+                        className="text-ink_muted hover:text-accent text-mini tabular-nums whitespace-nowrap"
                         title="Open original PDF filing"
                       >
-                        PDF ↗
+                        PDF&nbsp;↗
                       </a>
                     )}
                   </div>
