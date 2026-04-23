@@ -140,38 +140,37 @@ export default function TickerPage({ symbol, filersById }) {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 mb-8">
-        <div className="min-w-0">
-          <SectionHeader title="Trade timeline" />
-          <Card className="p-4">
-            <PersonalTimeline trades={trades} highlightTicker={ticker} />
-          </Card>
-        </div>
-        <div className="min-w-0">
-          <SectionHeader title="Top holders" />
-          <Card className="overflow-hidden">
-            <div className="divide-y divide-stroke_soft">
-              {stats.topFilers.map((f) => {
-                const lookup = filersById?.get?.(f.id) ?? { full_name: f.name, chamber: f.chamber, branch: f.branch };
-                return (
-                  <div
-                    key={f.id}
-                    className="px-4 py-[8px] flex items-center gap-2.5 hover:bg-muted cursor-pointer"
-                    onClick={() => navigate(`/filer/${f.id}`)}
-                  >
-                    <FilerAvatar filer={lookup} size={24} />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-small font-medium text-ink truncate">{f.name}</div>
-                      <div className="text-mini text-ink_muted tabular-nums whitespace-nowrap mt-[2px]">
-                        {f.count} · {fmtUSD(f.vol)}
-                      </div>
+      <div className="mb-8">
+        <SectionHeader title="Trade timeline" />
+        <Card className="p-4">
+          <PersonalTimeline trades={trades} highlightTicker={ticker} />
+        </Card>
+      </div>
+
+      <div className="mb-10">
+        <SectionHeader title="Top holders" subtitle="Ranked by number of trades in this ticker" />
+        <Card className="overflow-hidden">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 divide-x divide-y divide-stroke_soft">
+            {stats.topFilers.map((f) => {
+              const lookup = filersById?.get?.(f.id) ?? { full_name: f.name, chamber: f.chamber, branch: f.branch };
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => navigate(`/filer/${f.id}`)}
+                  className="px-4 py-[10px] flex items-center gap-2.5 hover:bg-muted text-left min-w-0"
+                >
+                  <FilerAvatar filer={lookup} size={28} />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-small font-medium text-ink truncate">{f.name}</div>
+                    <div className="text-mini text-ink_muted tabular-nums whitespace-nowrap mt-[1px]">
+                      {f.count} · {fmtUSD(f.vol)}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </Card>
-        </div>
+                </button>
+              );
+            })}
+          </div>
+        </Card>
       </div>
 
       <SectionHeader title="All trades" subtitle={`${fmtInt(filtered.length)} of ${fmtInt(trades.length)}`} />
