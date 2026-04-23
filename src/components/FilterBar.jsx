@@ -415,23 +415,34 @@ function AddFilterButton({ categories, onAdd, open, setOpen }) {
 function CategoryRow({ cat, active, onHover, onSelect }) {
   const [submenuOpen, setSubmenuOpen] = useState(false);
   const rowRef = useRef(null);
+
+  // Keyboard/mouse: hover opens submenu. Touch: hover doesn't fire cleanly, so
+  // the click handler ensures the submenu opens even if mouseenter was missed.
+  // `hasHover` media query feature-detects pointer devices so touch gets the
+  // click-to-open flow without the mouseenter-then-click flicker.
+  const handleClick = () => {
+    if (cat.kind === "text") {
+      onSelect("");
+    } else {
+      setSubmenuOpen(true);
+    }
+  };
+
   return (
     <div
       ref={rowRef}
       onMouseEnter={() => {
         onHover();
-        if (cat.kind !== "text") setSubmenuOpen(true);
+        if (cat.kind !== "text" && window.matchMedia?.("(hover: hover)").matches) {
+          setSubmenuOpen(true);
+        }
       }}
-      onMouseLeave={() => setSubmenuOpen(false)}
+      onMouseLeave={() => {
+        if (window.matchMedia?.("(hover: hover)").matches) setSubmenuOpen(false);
+      }}
     >
       <button
-        onClick={() => {
-          if (cat.kind === "text") {
-            onSelect("");
-          } else {
-            setSubmenuOpen((s) => !s);
-          }
-        }}
+        onClick={handleClick}
         className={`w-full flex items-center gap-2 px-3 py-1.5 text-small text-left hover:bg-muted/70 ${
           active ? "bg-muted/50" : ""
         }`}
@@ -526,10 +537,20 @@ function Popover({ anchor, children, onClose, placement = "bottom" }) {
   useEffect(() => {
     if (!anchor.current) return;
     const r = anchor.current.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const POPOVER_W = 240; // conservative estimate for width clamping
     if (placement === "right") {
-      setPos({ top: r.top, left: r.right + 4 });
+      // Flip to below if a right-placed popover would overflow the viewport
+      // (happens on mobile where the parent popover already eats most width).
+      if (r.right + 4 + POPOVER_W > vw) {
+        setPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.left, vw - POPOVER_W - 8)) });
+      } else {
+        setPos({ top: r.top, left: r.right + 4 });
+      }
     } else {
-      setPos({ top: r.bottom + 4, left: r.left });
+      // Bottom placement: clamp left so the popover stays in-viewport.
+      const left = Math.max(8, Math.min(r.left, vw - POPOVER_W - 8));
+      setPos({ top: r.bottom + 4, left });
     }
   }, [anchor, placement]);
 
