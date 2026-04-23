@@ -355,56 +355,6 @@ export function SingleSelectChip({ label, icon: chipIcon, options, value, onChan
   );
 }
 
-// Sort control in the same chip idiom: "Sort | [current] ▾". Reuses Popover +
-// check-mark styling so Filers/Tickers stay visually consistent with Trades.
-export function SortButton({ options, value, onChange }) {
-  const [open, setOpen] = useState(false);
-  const btnRef = useRef(null);
-  const current = options.find((o) => o.k === value) ?? options[0];
-  const sortIcon = (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 6h13M3 12h9M3 18h5M17 14l4 4 4-4M21 18V6" />
-    </svg>
-  );
-  return (
-    <div className="relative inline-flex items-stretch border border-stroke rounded-md bg-panel overflow-hidden h-7 text-small">
-      <span className="inline-flex items-center gap-1.5 pl-2 pr-1.5 text-ink_muted border-r border-stroke">
-        <span className="text-ink_muted">{sortIcon}</span>
-        <span className="font-medium text-ink">Sort</span>
-      </span>
-      <button
-        ref={btnRef}
-        onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1 px-2 text-ink hover:bg-muted transition-colors"
-      >
-        <span className="font-medium">{current.label}</span>
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" className="text-ink_muted">
-          <path d="M2 4 L5 7 L8 4" />
-        </svg>
-      </button>
-      {open && (
-        <Popover anchor={btnRef} onClose={() => setOpen(false)}>
-          <div className="min-w-[200px] py-1">
-            {options.map((o) => (
-              <button
-                key={o.k}
-                onClick={() => {
-                  onChange(o.k);
-                  setOpen(false);
-                }}
-                className="w-full flex items-center gap-2 px-3 py-1.5 text-small text-left text-ink hover:bg-muted/70"
-              >
-                <span className="w-3 text-accent">{value === o.k ? icon.check : null}</span>
-                <span className="flex-1">{o.label}</span>
-              </button>
-            ))}
-          </div>
-        </Popover>
-      )}
-    </div>
-  );
-}
-
 // ---- Internal: legacy inline search used by the main FilterBar ---------------
 
 function InlineSearch({ value, onChange }) {

@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
-import { InlineSearchInput, SingleSelectChip, SortButton } from "../components/FilterBar";
+import { InlineSearchInput, SingleSelectChip } from "../components/FilterBar";
 import { FilerAvatar, SampleChip } from "../components/TablePrimitives";
 import { navigate, useQueryState } from "../router";
-import { Card, fmtInt, fmtUSD, SectionHeader, TABLE_HEADER_CLS } from "../ui";
+import { Card, fmtInt, fmtUSD, SectionHeader, SortHeader, TABLE_HEADER_CLS } from "../ui";
 
 const SORTS = {
   trades: { label: "Most trades", fn: (a, b) => b.trade_count - a.trade_count },
@@ -76,44 +76,38 @@ export default function FilersPage({ data }) {
           value={qs.branch}
           onChange={(v) => setQs({ branch: v })}
         />
-        <SortButton
-          options={Object.entries(SORTS).map(([k, s]) => ({ k, label: s.label }))}
-          value={qs.sort}
-          onChange={(v) => setQs({ sort: v })}
-        />
       </div>
 
       <FilersTable
         filtered={filtered}
         sort={qs.sort}
+        setSort={(v) => setQs({ sort: v })}
         onClear={() => setQs({ q: "", sort: "trades", branch: "all" })}
       />
     </div>
   );
 }
 
-// Columns: rank · avatar+name · trades · buy/sell split · volume · (late | alpha vs SPY)
-// The last column swaps between Late share and vs SPY depending on the active sort —
-// it'd be silly to sort by Late and not show the column users are sorting against.
-const GRID = "32px minmax(200px,1.8fr) 86px 108px 136px 168px";
+// Columns: rank · avatar+name · trades · buy/sell split · volume · late share · alpha vs SPY
+// Sortable headers let the user drive the order; URL ?sort=<key> still works.
+const GRID = "32px minmax(180px,1.6fr) 86px 104px 128px 120px 128px";
 
-function FilersTable({ filtered, sort, onClear }) {
-  const showLate = sort === "late";
-
+function FilersTable({ filtered, sort, setSort, onClear }) {
   return (
     <Card className="overflow-hidden">
       <div className="overflow-x-auto">
-      <div className="min-w-[820px]">
+      <div className="min-w-[900px]">
       <div
         className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
         style={{ gridTemplateColumns: GRID }}
       >
         <span className="text-right">#</span>
         <span>Filer</span>
-        <span className="tabular-nums text-right">Trades</span>
+        <SortHeader label="Trades" sortKey="trades" sort={sort} setSort={setSort} align="right" />
         <span className="tabular-nums text-right">Buy / Sell mix</span>
-        <span className="tabular-nums text-right">Est. volume</span>
-        <span className="tabular-nums text-right">{showLate ? "Late share" : "vs SPY"}</span>
+        <SortHeader label="Est. volume" sortKey="volume" sort={sort} setSort={setSort} align="right" />
+        <SortHeader label="Late share" sortKey="late" sort={sort} setSort={setSort} align="right" />
+        <SortHeader label="vs SPY" sortKey="alpha" sort={sort} setSort={setSort} align="right" />
       </div>
       <div className="divide-y divide-stroke_soft">
         {filtered.length === 0 && (
@@ -160,42 +154,40 @@ function FilersTable({ filtered, sort, onClear }) {
                 {f.est_volume ? fmtUSD(f.est_volume) : "—"}
               </span>
 
-              {showLate ? (
-                <div className="flex items-center justify-end gap-2 tabular-nums">
-                  {f.late_filings > 0 ? (
-                    <>
-                      <span
-                        className={`text-small font-semibold tabular-nums ${
-                          f.late_filings / f.trade_count >= 0.5 ? "text-warn" : "text-ink_muted"
-                        }`}
-                      >
-                        {((f.late_filings / f.trade_count) * 100).toFixed(0)}%
-                      </span>
-                      <span className="text-mini text-ink_faint tabular-nums whitespace-nowrap min-w-[34px] text-right">
-                        {f.late_filings}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-small text-ink_faint">—</span>
-                  )}
-                </div>
-              ) : (
-                <div className="flex items-center justify-end gap-2 tabular-nums">
-                  {alpha == null ? (
-                    <span className="text-small text-ink_faint">—</span>
-                  ) : (
-                    <>
-                      <span
-                        className={`text-small font-semibold tabular-nums ${alpha >= 0 ? "text-buy" : "text-sell"}`}
-                      >
-                        {alpha >= 0 ? "+" : ""}
-                        {alpha.toFixed(1)}%
-                      </span>
-                      <SampleChip n={f.scored_buys} />
-                    </>
-                  )}
-                </div>
-              )}
+              <div className="flex items-center justify-end gap-2 tabular-nums">
+                {f.late_filings > 0 ? (
+                  <>
+                    <span
+                      className={`text-small font-semibold tabular-nums ${
+                        f.late_filings / f.trade_count >= 0.5 ? "text-warn" : "text-ink_muted"
+                      }`}
+                    >
+                      {((f.late_filings / f.trade_count) * 100).toFixed(0)}%
+                    </span>
+                    <span className="text-mini text-ink_faint tabular-nums whitespace-nowrap min-w-[34px] text-right">
+                      {f.late_filings}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-small text-ink_faint">—</span>
+                )}
+              </div>
+
+              <div className="flex items-center justify-end gap-2 tabular-nums">
+                {alpha == null ? (
+                  <span className="text-small text-ink_faint">—</span>
+                ) : (
+                  <>
+                    <span
+                      className={`text-small font-semibold tabular-nums ${alpha >= 0 ? "text-buy" : "text-sell"}`}
+                    >
+                      {alpha >= 0 ? "+" : ""}
+                      {alpha.toFixed(1)}%
+                    </span>
+                    <SampleChip n={f.scored_buys} />
+                  </>
+                )}
+              </div>
             </button>
           );
         })}

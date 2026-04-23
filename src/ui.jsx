@@ -9,6 +9,32 @@ import { navigate } from "./router";
 // and causes narrower columns to wrap on two-word headers like "Buy / Sell mix".)
 export const TABLE_HEADER_CLS = "text-mini font-medium text-ink_muted";
 
+// Clickable table-column header with ascending/descending sort indicator.
+// `sort` is a string key (matches sortKey when active). `setSort(newKey)` is
+// called with the column's key — the parent decides how to toggle direction.
+export function SortHeader({ label, sortKey, sort, setSort, align = "left" }) {
+  const active = sort === sortKey;
+  const justify = align === "right" ? "justify-end" : align === "center" ? "justify-center" : "justify-start";
+  return (
+    <button
+      onClick={() => setSort(sortKey)}
+      className={`inline-flex items-center gap-1 cursor-pointer hover:text-ink tabular-nums text-${align} ${justify} ${active ? "text-ink" : ""}`}
+    >
+      <span>{label}</span>
+      {active ? (
+        <svg width="10" height="10" viewBox="0 0 10 10" className="text-ink shrink-0" aria-hidden="true">
+          <path d="M2 4 L5 7 L8 4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      ) : (
+        <svg width="8" height="10" viewBox="0 0 8 10" className="text-ink_faint shrink-0" aria-hidden="true">
+          <path d="M2 4 L4 2 L6 4" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <path d="M2 6 L4 8 L6 6" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
 // Soft zebra striping for data tables. Adds a near-invisible band to every other
 // row — the eye catches the pattern and tracks rows across columns without the
 // noise of full vertical gridlines (which feel Excel-era on a Linear-style canvas).

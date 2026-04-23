@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
-import { InlineSearchInput, SortButton } from "../components/FilterBar";
+import { InlineSearchInput } from "../components/FilterBar";
 import { TickerBadge, TickerLabel } from "../components/TickerBadge";
 import { navigate, useQueryState } from "../router";
-import { Card, fmtInt, fmtUSD, SectionHeader, TABLE_HEADER_CLS } from "../ui";
+import { Card, fmtInt, fmtUSD, SectionHeader, SortHeader, TABLE_HEADER_CLS } from "../ui";
 
 const SORTS = {
   trades: { label: "Most trades", fn: (a, b) => b.trade_count - a.trade_count },
@@ -73,11 +73,6 @@ export default function TickersPage({ data }) {
           placeholder="Filter ticker…"
           width={200}
         />
-        <SortButton
-          options={Object.entries(SORTS).map(([k, s]) => ({ k, label: s.label }))}
-          value={qs.sort}
-          onChange={(v) => setQs({ sort: v })}
-        />
       </div>
 
       <Card className="overflow-hidden">
@@ -89,11 +84,11 @@ export default function TickersPage({ data }) {
         >
           <span className="text-right">#</span>
           <span>Ticker</span>
-          <span className="tabular-nums text-right">Trades</span>
+          <SortHeader label="Trades" sortKey="trades" sort={qs.sort} setSort={(v) => setQs({ sort: v })} align="right" />
           <span className="tabular-nums text-right">Last · Δ1d</span>
-          <span className="tabular-nums text-right">Filers</span>
-          <span className="tabular-nums text-right">Buy / Sell mix</span>
-          <span className="tabular-nums text-right">Est. volume</span>
+          <SortHeader label="Filers" sortKey="filers" sort={qs.sort} setSort={(v) => setQs({ sort: v })} align="right" />
+          <SortHeader label="Buy / Sell mix" sortKey="buys" sort={qs.sort} setSort={(v) => setQs({ sort: v })} align="right" />
+          <SortHeader label="Est. volume" sortKey="volume" sort={qs.sort} setSort={(v) => setQs({ sort: v })} align="right" />
         </div>
         <div className="divide-y divide-stroke_soft">
           {filtered.length === 0 && (
