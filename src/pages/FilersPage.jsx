@@ -93,9 +93,82 @@ export default function FilersPage({ data }) {
 const GRID = "32px minmax(180px,1.6fr) 86px 104px 128px 120px 128px";
 
 function FilersTable({ filtered, sort, setSort, onClear }) {
+  const empty = filtered.length === 0 && (
+    <div className="px-4 py-8 text-small text-ink_muted text-center">
+      No filers match these filters.{" "}
+      <button onClick={onClear} className="text-accent hover:underline">
+        Clear filters
+      </button>
+      .
+    </div>
+  );
   return (
     <Card className="overflow-hidden">
-      <div className="overflow-x-auto">
+      {/* Mobile/tablet: stacked rows with zebra. */}
+      <div className="lg:hidden divide-y divide-stroke_soft">
+        {empty}
+        {filtered.slice(0, 500).map((f, i) => {
+          const alpha = f.weighted_excess;
+          const officeLine =
+            f.branch === "executive"
+              ? `${f.level ?? ""} ${f.agency ?? ""}`.trim() || "Executive"
+              : `${f.chamber === "senate" ? "Senate" : "House"} · ${f.party ?? "-"} · ${f.state ?? "-"}`;
+          return (
+            <button
+              key={f.id}
+              onClick={() => navigate(`/filer/${f.id}`)}
+              className="w-full px-3 py-3 text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0 text-right">
+                    {i + 1}
+                  </span>
+                  <FilerAvatar filer={f} size={28} />
+                  <div className="min-w-0">
+                    <div className="text-small text-ink font-medium truncate">{f.full_name}</div>
+                    <div className="text-mini text-ink_muted truncate mt-[1px]">{officeLine}</div>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  {alpha != null ? (
+                    <div
+                      className={`text-small font-semibold tabular-nums ${alpha >= 0 ? "text-buy" : "text-sell"}`}
+                    >
+                      {alpha >= 0 ? "+" : ""}
+                      {alpha.toFixed(1)}% vs SPY
+                    </div>
+                  ) : (
+                    <div className="text-small text-ink_faint">no SPY data</div>
+                  )}
+                  <div className="text-mini text-ink_muted tabular-nums mt-[1px]">
+                    {f.trade_count.toLocaleString()} trades
+                  </div>
+                </div>
+              </div>
+              <div className="mt-2 ml-7 flex items-center justify-between gap-2 text-mini tabular-nums text-ink_muted">
+                <span>
+                  <span className="text-buy">{f.purchases || 0}</span>
+                  <span className="text-ink_faint mx-[2px]">/</span>
+                  <span className="text-sell">{f.sales || 0}</span>
+                  {f.est_volume ? <span className="text-ink_faint"> · {fmtUSD(f.est_volume)}</span> : null}
+                </span>
+                {f.late_filings > 0 && (
+                  <span
+                    className={
+                      f.late_filings / f.trade_count >= 0.5 ? "text-warn font-medium" : "text-ink_muted"
+                    }
+                  >
+                    {((f.late_filings / f.trade_count) * 100).toFixed(0)}% late ({f.late_filings})
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      {/* Desktop: full grid table. */}
+      <div className="hidden lg:block overflow-x-auto">
       <div className="min-w-[900px]">
       <div
         className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
@@ -110,15 +183,7 @@ function FilersTable({ filtered, sort, setSort, onClear }) {
         <SortHeader label="vs SPY" sortKey="alpha" sort={sort} setSort={setSort} align="right" />
       </div>
       <div className="divide-y divide-stroke_soft">
-        {filtered.length === 0 && (
-          <div className="px-4 py-8 text-small text-ink_muted text-center">
-            No filers match these filters.{" "}
-            <button onClick={onClear} className="text-accent hover:underline">
-              Clear filters
-            </button>
-            .
-          </div>
-        )}
+        {empty}
         {filtered.slice(0, 500).map((f, i) => {
           const alpha = f.weighted_excess;
           return (

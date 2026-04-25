@@ -76,7 +76,65 @@ export default function TickersPage({ data }) {
       </div>
 
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile/tablet: stacked rows with zebra. */}
+        <div className="lg:hidden divide-y divide-stroke_soft">
+          {filtered.length === 0 && (
+            <div className="px-4 py-8 text-small text-ink_muted text-center">
+              No tickers match.{" "}
+              <button onClick={() => setQs({ q: "", sort: "trades" })} className="text-accent hover:underline">
+                Clear filters
+              </button>
+              .
+            </div>
+          )}
+          {filtered.slice(0, 1000).map((t, i) => {
+            const p = prices[t.ticker];
+            const change = dailyChange(p);
+            return (
+              <button
+                key={t.ticker}
+                onClick={() => navigate(`/ticker/${t.ticker}`)}
+                className="w-full px-3 py-3 text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0 text-right">
+                      {i + 1}
+                    </span>
+                    <TickerLabel ticker={t.ticker} size="sm" />
+                  </div>
+                  <div className="text-right shrink-0 tabular-nums">
+                    {p?.latest?.close != null ? (
+                      <>
+                        <span className="text-small text-ink font-mono">${p.latest.close.toFixed(2)}</span>
+                        {change != null && (
+                          <span className={`text-mini ml-1 ${change >= 0 ? "text-buy" : "text-sell"}`}>
+                            {change >= 0 ? "+" : ""}
+                            {change.toFixed(1)}%
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-small text-ink_faint">—</span>
+                    )}
+                  </div>
+                </div>
+                <div className="mt-1.5 ml-7 flex items-center justify-between gap-2 text-mini tabular-nums text-ink_muted">
+                  <span>
+                    {t.trade_count.toLocaleString()} trades · {t.filer_count} filers
+                  </span>
+                  <span>
+                    <span className="text-buy">{t.purchases}</span>
+                    <span className="text-ink_faint mx-[2px]">/</span>
+                    <span className="text-sell">{t.sales}</span>
+                    <span className="text-ink_faint"> · {fmtUSD(t.est_volume)}</span>
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        <div className="hidden lg:block overflow-x-auto">
         <div className="min-w-[880px]">
         <div
           className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}

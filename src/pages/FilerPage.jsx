@@ -362,7 +362,7 @@ function TickerAttributionSection({ rows }) {
       <SectionHeader title="Performance by ticker" subtitle="Per-ticker contribution to weighted alpha" />
       <Card className="overflow-hidden">
         {/* Mobile: stacked rows. Desktop: full grid. */}
-        <div className="md:hidden divide-y divide-stroke_soft">
+        <div className="lg:hidden divide-y divide-stroke_soft">
           {top.map((r, i) => {
             const alpha = r.tickerAlpha;
             return (
@@ -409,7 +409,7 @@ function TickerAttributionSection({ rows }) {
             );
           })}
         </div>
-        <div className="hidden md:block overflow-x-auto">
+        <div className="hidden lg:block overflow-x-auto">
           <div className="min-w-[720px]">
             <div
               className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
@@ -507,7 +507,7 @@ function AlphaDriversSection({ drivers }) {
       <SectionHeader title="What drove this alpha" subtitle={subtitle} />
       <Card className="overflow-hidden">
         {/* Mobile: stacked rows. Desktop: full grid. */}
-        <div className="md:hidden divide-y divide-stroke_soft">
+        <div className="lg:hidden divide-y divide-stroke_soft">
           {top.map((d, i) => {
             const ex = d.excess ?? 0;
             const ret = d.ret ?? 0;
@@ -571,7 +571,7 @@ function AlphaDriversSection({ drivers }) {
             );
           })}
         </div>
-        <div className="hidden md:block overflow-x-auto">
+        <div className="hidden lg:block overflow-x-auto">
           <div className="min-w-[960px]">
             <div
               className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
@@ -768,7 +768,7 @@ function ImaginaryPortfolio({ trades }) {
 
       <Card className="overflow-hidden">
         {/* Mobile: stacked rows with zebra striping. Desktop: full grid. */}
-        <div className="md:hidden divide-y divide-stroke_soft">
+        <div className="lg:hidden divide-y divide-stroke_soft">
           {data.holdings.slice(0, 15).map((p, i) => (
             <button
               key={p.ticker}
@@ -801,7 +801,7 @@ function ImaginaryPortfolio({ trades }) {
             </button>
           ))}
         </div>
-        <div className="hidden md:block overflow-x-auto">
+        <div className="hidden lg:block overflow-x-auto">
           <div className="min-w-[760px]">
             <div
               className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
