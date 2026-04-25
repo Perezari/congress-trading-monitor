@@ -361,62 +361,110 @@ function TickerAttributionSection({ rows }) {
     <div className="mb-10">
       <SectionHeader title="Performance by ticker" subtitle="Per-ticker contribution to weighted alpha" />
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-        <div className="min-w-[720px]">
-        <div
-          className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
-          style={{ gridTemplateColumns: TICKER_GRID }}
-        >
-          <span className="text-right">#</span>
-          <span>Ticker</span>
-          <span className="tabular-nums text-right">Trades</span>
-          <span className="tabular-nums text-right">Buy / Sell mix</span>
-          <span className="tabular-nums text-right">Hit rate</span>
-          <span className="tabular-nums text-right">vs SPY</span>
-        </div>
-        <div className="divide-y divide-stroke_soft">
+        {/* Mobile: stacked rows. Desktop: full grid. */}
+        <div className="md:hidden divide-y divide-stroke_soft">
           {top.map((r, i) => {
             const alpha = r.tickerAlpha;
             return (
               <button
                 key={r.ticker}
                 onClick={() => navigate(`/ticker/${r.ticker}`)}
-                className="w-full grid gap-3 px-4 py-[10px] items-center text-left text-small even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
-                style={{ gridTemplateColumns: TICKER_GRID }}
+                className="w-full px-3 py-3 text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
               >
-                <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
-                <div className="flex items-center min-w-0">
-                  <TickerLabel ticker={r.ticker} size="sm" />
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0">{i + 1}</span>
+                    <TickerLabel ticker={r.ticker} size="sm" />
+                  </div>
+                  <span
+                    className={`text-small font-semibold tabular-nums shrink-0 ${alpha == null ? "text-ink_faint" : alpha >= 0 ? "text-buy" : "text-sell"}`}
+                  >
+                    {alpha == null ? "—" : `${alpha >= 0 ? "+" : ""}${alpha.toFixed(0)}% vs SPY`}
+                  </span>
                 </div>
-                <span className="tabular-nums text-right text-ink">{r.total}</span>
-                <span className="text-mini tabular-nums text-right whitespace-nowrap">
-                  <span className="text-buy">{r.buys}</span>
-                  <span className="text-ink_faint mx-[2px]">/</span>
-                  <span className="text-sell">{r.sells}</span>
-                </span>
-                <span
-                  className={`tabular-nums text-right text-mini ${
-                    r.tickerHitRate == null
-                      ? "text-ink_faint"
-                      : r.tickerHitRate >= 0.7
-                        ? "text-buy font-medium"
-                        : r.tickerHitRate <= 0.3
-                          ? "text-sell font-medium"
-                          : "text-ink_muted"
-                  }`}
-                >
-                  {r.tickerHitRate == null ? "—" : `${(r.tickerHitRate * 100).toFixed(0)}% · ${r.wins}/${r.scored}`}
-                </span>
-                <span
-                  className={`tabular-nums text-right font-medium ${alpha == null ? "text-ink_faint" : alpha >= 0 ? "text-buy" : "text-sell"}`}
-                >
-                  {alpha == null ? "—" : `${alpha >= 0 ? "+" : ""}${alpha.toFixed(0)}%`}
-                </span>
+                <div className="mt-1.5 flex items-center justify-between gap-2 text-mini tabular-nums text-ink_muted">
+                  <span>
+                    {r.total} trades ·{" "}
+                    <span className="text-buy">{r.buys}</span>
+                    <span className="text-ink_faint mx-[2px]">/</span>
+                    <span className="text-sell">{r.sells}</span>
+                  </span>
+                  <span
+                    className={
+                      r.tickerHitRate == null
+                        ? "text-ink_faint"
+                        : r.tickerHitRate >= 0.7
+                          ? "text-buy font-medium"
+                          : r.tickerHitRate <= 0.3
+                            ? "text-sell font-medium"
+                            : "text-ink_muted"
+                    }
+                  >
+                    {r.tickerHitRate == null
+                      ? "no hit rate"
+                      : `${(r.tickerHitRate * 100).toFixed(0)}% hit · ${r.wins}/${r.scored}`}
+                  </span>
+                </div>
               </button>
             );
           })}
         </div>
-        </div>
+        <div className="hidden md:block overflow-x-auto">
+          <div className="min-w-[720px]">
+            <div
+              className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
+              style={{ gridTemplateColumns: TICKER_GRID }}
+            >
+              <span className="text-right">#</span>
+              <span>Ticker</span>
+              <span className="tabular-nums text-right">Trades</span>
+              <span className="tabular-nums text-right">Buy / Sell mix</span>
+              <span className="tabular-nums text-right">Hit rate</span>
+              <span className="tabular-nums text-right">vs SPY</span>
+            </div>
+            <div className="divide-y divide-stroke_soft">
+              {top.map((r, i) => {
+                const alpha = r.tickerAlpha;
+                return (
+                  <button
+                    key={r.ticker}
+                    onClick={() => navigate(`/ticker/${r.ticker}`)}
+                    className="w-full grid gap-3 px-4 py-[10px] items-center text-left text-small even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+                    style={{ gridTemplateColumns: TICKER_GRID }}
+                  >
+                    <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
+                    <div className="flex items-center min-w-0">
+                      <TickerLabel ticker={r.ticker} size="sm" />
+                    </div>
+                    <span className="tabular-nums text-right text-ink">{r.total}</span>
+                    <span className="text-mini tabular-nums text-right whitespace-nowrap">
+                      <span className="text-buy">{r.buys}</span>
+                      <span className="text-ink_faint mx-[2px]">/</span>
+                      <span className="text-sell">{r.sells}</span>
+                    </span>
+                    <span
+                      className={`tabular-nums text-right text-mini ${
+                        r.tickerHitRate == null
+                          ? "text-ink_faint"
+                          : r.tickerHitRate >= 0.7
+                            ? "text-buy font-medium"
+                            : r.tickerHitRate <= 0.3
+                              ? "text-sell font-medium"
+                              : "text-ink_muted"
+                      }`}
+                    >
+                      {r.tickerHitRate == null ? "—" : `${(r.tickerHitRate * 100).toFixed(0)}% · ${r.wins}/${r.scored}`}
+                    </span>
+                    <span
+                      className={`tabular-nums text-right font-medium ${alpha == null ? "text-ink_faint" : alpha >= 0 ? "text-buy" : "text-sell"}`}
+                    >
+                      {alpha == null ? "—" : `${alpha >= 0 ? "+" : ""}${alpha.toFixed(0)}%`}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </Card>
     </div>
@@ -458,69 +506,62 @@ function AlphaDriversSection({ drivers }) {
     <div className="mb-10">
       <SectionHeader title="What drove this alpha" subtitle={subtitle} />
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-        <div className="min-w-[960px]">
-        <div
-          className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
-          style={{ gridTemplateColumns: DRIVER_GRID }}
-        >
-          <span className="text-right">#</span>
-          <span>Ticker</span>
-          <span>Asset</span>
-          <span className="tabular-nums text-right">Bought</span>
-          <span className="tabular-nums text-right">Held</span>
-          <span className="tabular-nums text-right">Size</span>
-          <span className="tabular-nums text-right">Return</span>
-          <span className="tabular-nums text-right">vs SPY</span>
-          <span className="text-right"></span>
-        </div>
-        <div className="divide-y divide-stroke_soft">
+        {/* Mobile: stacked rows. Desktop: full grid. */}
+        <div className="md:hidden divide-y divide-stroke_soft">
           {top.map((d, i) => {
             const ex = d.excess ?? 0;
             const ret = d.ret ?? 0;
             return (
               <div
                 key={d.id}
-                className="grid gap-3 px-4 py-[10px] items-center text-small even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
-                style={{ gridTemplateColumns: DRIVER_GRID }}
+                className="px-3 py-3 even:bg-[lch(95.5%_0_282)]"
               >
-                <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
-                <button
-                  onClick={() => d.ticker && navigate(`/ticker/${d.ticker}`)}
-                  className="text-left hover:text-accent"
-                >
-                  {d.ticker ? <TickerLabel ticker={d.ticker} size="sm" /> : <span className="text-ink_faint">—</span>}
-                </button>
-                <div className="min-w-0">
-                  <div className="text-ink_muted truncate" title={d.asset_name}>
-                    {cleanAssetName(d.asset_name)}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0">{i + 1}</span>
+                    <button
+                      onClick={() => d.ticker && navigate(`/ticker/${d.ticker}`)}
+                      className="hover:opacity-80 shrink-0"
+                    >
+                      {d.ticker ? (
+                        <TickerLabel ticker={d.ticker} size="sm" />
+                      ) : (
+                        <span className="text-ink_faint">—</span>
+                      )}
+                    </button>
+                    <span className="text-mini text-ink_muted truncate" title={d.asset_name}>
+                      {cleanAssetName(d.asset_name)}
+                    </span>
                   </div>
-                  {d.comment && (
-                    <div className="text-mini text-ink_faint truncate italic mt-[1px]" title={d.comment}>
-                      {d.comment}
-                    </div>
-                  )}
+                  <span
+                    className={`text-small font-semibold tabular-nums shrink-0 ${ex >= 0 ? "text-buy" : "text-sell"}`}
+                  >
+                    {ex >= 0 ? "+" : ""}
+                    {ex.toFixed(0)}% vs SPY
+                  </span>
                 </div>
-                <span className="text-right text-ink_muted tabular-nums font-mono">{d.transaction_date}</span>
-                <span className="text-right text-ink_muted tabular-nums">{holdingLabel(d.transaction_date)}</span>
-                <span className="text-right text-ink tabular-nums">{fmtUSD(d.mid)}</span>
-                <span className={`text-right tabular-nums ${ret >= 0 ? "text-buy" : "text-sell"}`}>
-                  {ret >= 0 ? "+" : ""}
-                  {ret.toFixed(0)}%
-                </span>
-                <span className={`text-right tabular-nums font-semibold ${ex >= 0 ? "text-buy" : "text-sell"}`}>
-                  {ex >= 0 ? "+" : ""}
-                  {ex.toFixed(0)}%
-                </span>
-                <div className="text-right">
+                {d.comment && (
+                  <div className="text-mini text-ink_faint italic truncate mt-[2px] ml-7" title={d.comment}>
+                    {d.comment}
+                  </div>
+                )}
+                <div className="mt-2 ml-7 flex items-center justify-between gap-2 text-mini tabular-nums text-ink_muted">
+                  <span className="flex items-center gap-2 flex-wrap">
+                    <span className="font-mono whitespace-nowrap">
+                      {d.transaction_date} · {holdingLabel(d.transaction_date)}
+                    </span>
+                    <span className="text-ink whitespace-nowrap">{fmtUSD(d.mid)}</span>
+                    <span className={`whitespace-nowrap ${ret >= 0 ? "text-buy" : "text-sell"}`}>
+                      {ret >= 0 ? "+" : ""}
+                      {ret.toFixed(0)}%
+                    </span>
+                  </span>
                   {d.doc_url && (
                     <a
                       href={d.doc_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-ink_muted hover:text-accent text-mini whitespace-nowrap"
-                      title="Open original PDF filing"
+                      className="text-ink_muted hover:text-accent whitespace-nowrap shrink-0"
                     >
                       PDF&nbsp;↗
                     </a>
@@ -530,9 +571,97 @@ function AlphaDriversSection({ drivers }) {
             );
           })}
         </div>
-        </div>
+        <div className="hidden md:block overflow-x-auto">
+          <div className="min-w-[960px]">
+            <div
+              className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
+              style={{ gridTemplateColumns: DRIVER_GRID }}
+            >
+              <span className="text-right">#</span>
+              <span>Ticker</span>
+              <span>Asset</span>
+              <span className="tabular-nums text-right">Bought</span>
+              <span className="tabular-nums text-right">Held</span>
+              <span className="tabular-nums text-right">Size</span>
+              <span className="tabular-nums text-right">Return</span>
+              <span className="tabular-nums text-right">vs SPY</span>
+              <span className="text-right"></span>
+            </div>
+            <div className="divide-y divide-stroke_soft">
+              {top.map((d, i) => {
+                const ex = d.excess ?? 0;
+                const ret = d.ret ?? 0;
+                return (
+                  <div
+                    key={d.id}
+                    className="grid gap-3 px-4 py-[10px] items-center text-small even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+                    style={{ gridTemplateColumns: DRIVER_GRID }}
+                  >
+                    <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
+                    <button
+                      onClick={() => d.ticker && navigate(`/ticker/${d.ticker}`)}
+                      className="text-left hover:text-accent"
+                    >
+                      {d.ticker ? <TickerLabel ticker={d.ticker} size="sm" /> : <span className="text-ink_faint">—</span>}
+                    </button>
+                    <div className="min-w-0">
+                      <div className="text-ink_muted truncate" title={d.asset_name}>
+                        {cleanAssetName(d.asset_name)}
+                      </div>
+                      {d.comment && (
+                        <div className="text-mini text-ink_faint truncate italic mt-[1px]" title={d.comment}>
+                          {d.comment}
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-right text-ink_muted tabular-nums font-mono">{d.transaction_date}</span>
+                    <span className="text-right text-ink_muted tabular-nums">{holdingLabel(d.transaction_date)}</span>
+                    <span className="text-right text-ink tabular-nums">{fmtUSD(d.mid)}</span>
+                    <span className={`text-right tabular-nums ${ret >= 0 ? "text-buy" : "text-sell"}`}>
+                      {ret >= 0 ? "+" : ""}
+                      {ret.toFixed(0)}%
+                    </span>
+                    <span className={`text-right tabular-nums font-semibold ${ex >= 0 ? "text-buy" : "text-sell"}`}>
+                      {ex >= 0 ? "+" : ""}
+                      {ex.toFixed(0)}%
+                    </span>
+                    <div className="text-right">
+                      {d.doc_url && (
+                        <a
+                          href={d.doc_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-ink_muted hover:text-accent text-mini whitespace-nowrap"
+                          title="Open original PDF filing"
+                        >
+                          PDF&nbsp;↗
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </Card>
+    </div>
+  );
+}
+
+// Linear-style compact stat: muted small label, semibold tabular-nums value
+// sized to read clearly without overpowering the page on mobile.
+function PortfolioStat({ label, value, valueTone = "text-ink", hint, hintTone = "text-ink_faint" }) {
+  return (
+    <div>
+      <div className="text-mini font-medium text-ink_muted">{label}</div>
+      <div
+        className={`mt-1 text-large sm:text-[1.5rem] font-semibold tabular-nums tracking-[-0.012em] leading-tight ${valueTone}`}
+      >
+        {value}
+      </div>
+      {hint && <div className={`text-mini tabular-nums mt-0.5 ${hintTone}`}>{hint}</div>}
     </div>
   );
 }
@@ -610,49 +739,69 @@ function ImaginaryPortfolio({ trades }) {
       />
 
       <Card className="p-4 sm:p-5 mb-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-5">
-          <div>
-            <div className="text-mini font-medium text-ink_muted uppercase tracking-[0.06em]">Portfolio value</div>
-            <div className="mt-1.5 text-[1.375rem] sm:text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none text-ink">
-              {fmtUSD(data.value)}
-            </div>
-            <div className="text-mini text-ink_faint mt-1.5">from {fmtUSD(data.cost)} cost</div>
-          </div>
-          <div>
-            <div className="text-mini font-medium text-ink_muted uppercase tracking-[0.06em]">Unrealized gain</div>
-            <div
-              className={`mt-1.5 text-[1.375rem] sm:text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none ${data.gain >= 0 ? "text-buy" : "text-sell"}`}
-            >
-              {data.gain >= 0 ? "+" : ""}
-              {fmtUSD(data.gain)}
-            </div>
-            <div className={`text-mini mt-1.5 ${data.gain >= 0 ? "text-buy" : "text-sell"}`}>
-              {data.gainPct >= 0 ? "+" : ""}
-              {data.gainPct.toFixed(1)}%
-            </div>
-          </div>
-          <div>
-            <div className="text-mini font-medium text-ink_muted uppercase tracking-[0.06em]">vs same-$ SPY</div>
-            <div
-              className={`mt-1.5 text-[1.375rem] sm:text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none ${data.vsSpy >= 0 ? "text-buy" : "text-sell"}`}
-            >
-              {data.vsSpy >= 0 ? "+" : ""}
-              {fmtUSD(data.vsSpy)}
-            </div>
-            <div className="text-mini text-ink_faint mt-1.5">SPY would hold {fmtUSD(data.spyValue)}</div>
-          </div>
-          <div>
-            <div className="text-mini font-medium text-ink_muted uppercase tracking-[0.06em]">Positions</div>
-            <div className="mt-1.5 text-[1.375rem] sm:text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none text-ink">
-              {data.holdings.length}
-            </div>
-            <div className="text-mini text-ink_faint mt-1.5">{fmtInt(data.scoredBuys)} buys scored</div>
-          </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-4 sm:gap-y-5">
+          <PortfolioStat
+            label="Portfolio value"
+            value={fmtUSD(data.value)}
+            hint={`from ${fmtUSD(data.cost)} cost`}
+          />
+          <PortfolioStat
+            label="Unrealized gain"
+            value={`${data.gain >= 0 ? "+" : ""}${fmtUSD(data.gain)}`}
+            valueTone={data.gain >= 0 ? "text-buy" : "text-sell"}
+            hint={`${data.gainPct >= 0 ? "+" : ""}${data.gainPct.toFixed(1)}%`}
+            hintTone={data.gain >= 0 ? "text-buy" : "text-sell"}
+          />
+          <PortfolioStat
+            label="vs same-$ SPY"
+            value={`${data.vsSpy >= 0 ? "+" : ""}${fmtUSD(data.vsSpy)}`}
+            valueTone={data.vsSpy >= 0 ? "text-buy" : "text-sell"}
+            hint={`SPY would hold ${fmtUSD(data.spyValue)}`}
+          />
+          <PortfolioStat
+            label="Positions"
+            value={data.holdings.length}
+            hint={`${fmtInt(data.scoredBuys)} buys scored`}
+          />
         </div>
       </Card>
 
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile: stacked rows with zebra striping. Desktop: full grid. */}
+        <div className="md:hidden divide-y divide-stroke_soft">
+          {data.holdings.slice(0, 15).map((p, i) => (
+            <button
+              key={p.ticker}
+              onClick={() => navigate(`/ticker/${p.ticker}`)}
+              className="w-full px-3 py-3 text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0">{i + 1}</span>
+                  <TickerBadge ticker={p.ticker} size="sm" />
+                  <span className="text-mini text-ink_muted truncate" title={p.asset_name}>
+                    {cleanAssetName(p.asset_name)}
+                  </span>
+                </div>
+                <span
+                  className={`text-small font-semibold tabular-nums shrink-0 ${p.gain >= 0 ? "text-buy" : "text-sell"}`}
+                >
+                  {p.gain >= 0 ? "+" : ""}
+                  {p.gainPct.toFixed(0)}%
+                </span>
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-2 text-mini tabular-nums text-ink_muted">
+                <span className="font-mono">Since {p.firstDate}</span>
+                <span>
+                  <span className="text-ink font-medium">{fmtUSD(p.value)}</span>
+                  <span className="text-ink_faint"> from {fmtUSD(p.cost)}</span>
+                  <span className="text-ink_faint"> · {p.weight.toFixed(0)}%</span>
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+        <div className="hidden md:block overflow-x-auto">
           <div className="min-w-[760px]">
             <div
               className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
@@ -696,13 +845,13 @@ function ImaginaryPortfolio({ trades }) {
                 </button>
               ))}
             </div>
-            {data.holdings.length > 15 && (
-              <div className="px-4 py-2 border-t border-stroke text-mini text-ink_muted text-center">
-                Showing top 15 of {data.holdings.length} positions by value
-              </div>
-            )}
           </div>
         </div>
+        {data.holdings.length > 15 && (
+          <div className="px-4 py-2 border-t border-stroke text-mini text-ink_muted text-center">
+            Showing top 15 of {data.holdings.length} positions by value
+          </div>
+        )}
       </Card>
     </div>
   );

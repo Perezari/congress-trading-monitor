@@ -128,7 +128,7 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
   return (
     <div className="border border-stroke rounded-md bg-panel overflow-hidden">
       {/* Mobile: stacked cards. Desktop (sm+): the original wide grid. */}
-      <div className="sm:hidden divide-y divide-stroke_soft">
+      <div className="md:hidden divide-y divide-stroke_soft">
         {displayed.length === 0 && (
           <div className="px-4 py-10 text-small text-ink_muted text-center">
             No trades match the current filters.
@@ -138,7 +138,7 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
           <MobileTradeCard key={t.id} t={t} filersById={filersById} />
         ))}
       </div>
-      <div className="hidden sm:block overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto">
         <div className="min-w-[1100px]">
           <div
             className={`grid gap-3 px-3 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
