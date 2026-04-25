@@ -1,17 +1,17 @@
 {
-  "totalTrades": 54102,
-  "totalFilers": 380,
-  "totalFilings": 48828,
-  "totalParsedFilings": 7486,
+  "totalTrades": 56888,
+  "totalFilers": 422,
+  "totalFilings": 53330,
+  "totalParsedFilings": 7710,
   "lateFilings": 9938,
-  "estVolumeUsd": 5112469532,
+  "estVolumeUsd": 5702473921,
   "dateRange": {
     "from": "2012-02-27",
     "to": "2026-04-09"
   },
   "bySource": {
     "house_clerk": 42655,
-    "oge_executive": 3226,
+    "oge_executive": 6012,
     "senate_efd": 8221
   },
   "disclosureLag": {
@@ -59,5 +59,5 @@
       }
     ]
   },
-  "generatedAt": "2026-04-23T15:52:39.900Z"
+  "generatedAt": "2026-04-25T08:45:58.162Z"
 }
