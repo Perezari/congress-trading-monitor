@@ -147,11 +147,11 @@ export function Card({ children, className = "" }) {
 export function SectionHeader({ title, subtitle, right }) {
   return (
     <div className="flex items-baseline justify-between gap-4 mb-4">
-      <div>
+      <div className="min-w-0">
         <h2 className="text-large font-semibold text-ink tracking-[-0.005em]">{title}</h2>
         {subtitle && <p className="text-small text-ink_muted mt-[2px]">{subtitle}</p>}
       </div>
-      {right}
+      {right && <div className="shrink-0 whitespace-nowrap">{right}</div>}
     </div>
   );
 }

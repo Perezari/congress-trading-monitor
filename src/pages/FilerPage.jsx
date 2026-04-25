@@ -251,7 +251,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
           <AvatarPrimitive filer={filer} size={44} />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-[1.625rem] leading-[1.15] font-semibold tracking-[-0.012em] text-ink">
+              <h1 className="text-[1.375rem] sm:text-[1.625rem] leading-[1.15] font-semibold tracking-[-0.012em] text-ink">
                 {filer.full_name}
               </h1>
               <BranchDotPill filer={filer} />
@@ -609,11 +609,11 @@ function ImaginaryPortfolio({ trades }) {
         subtitle="What this portfolio would be worth today if every disclosed buy was held to today's close — no sales, no rebalancing. Positions reported as sold are not deducted."
       />
 
-      <Card className="p-5 mb-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-5">
+      <Card className="p-4 sm:p-5 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-5">
           <div>
             <div className="text-mini font-medium text-ink_muted uppercase tracking-[0.06em]">Portfolio value</div>
-            <div className="mt-1.5 text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none text-ink">
+            <div className="mt-1.5 text-[1.375rem] sm:text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none text-ink">
               {fmtUSD(data.value)}
             </div>
             <div className="text-mini text-ink_faint mt-1.5">from {fmtUSD(data.cost)} cost</div>
@@ -621,7 +621,7 @@ function ImaginaryPortfolio({ trades }) {
           <div>
             <div className="text-mini font-medium text-ink_muted uppercase tracking-[0.06em]">Unrealized gain</div>
             <div
-              className={`mt-1.5 text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none ${data.gain >= 0 ? "text-buy" : "text-sell"}`}
+              className={`mt-1.5 text-[1.375rem] sm:text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none ${data.gain >= 0 ? "text-buy" : "text-sell"}`}
             >
               {data.gain >= 0 ? "+" : ""}
               {fmtUSD(data.gain)}
@@ -634,7 +634,7 @@ function ImaginaryPortfolio({ trades }) {
           <div>
             <div className="text-mini font-medium text-ink_muted uppercase tracking-[0.06em]">vs same-$ SPY</div>
             <div
-              className={`mt-1.5 text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none ${data.vsSpy >= 0 ? "text-buy" : "text-sell"}`}
+              className={`mt-1.5 text-[1.375rem] sm:text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none ${data.vsSpy >= 0 ? "text-buy" : "text-sell"}`}
             >
               {data.vsSpy >= 0 ? "+" : ""}
               {fmtUSD(data.vsSpy)}
@@ -643,7 +643,7 @@ function ImaginaryPortfolio({ trades }) {
           </div>
           <div>
             <div className="text-mini font-medium text-ink_muted uppercase tracking-[0.06em]">Positions</div>
-            <div className="mt-1.5 text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none text-ink">
+            <div className="mt-1.5 text-[1.375rem] sm:text-[1.75rem] font-semibold tabular-nums tracking-[-0.012em] leading-none text-ink">
               {data.holdings.length}
             </div>
             <div className="text-mini text-ink_faint mt-1.5">{fmtInt(data.scoredBuys)} buys scored</div>
