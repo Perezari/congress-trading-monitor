@@ -75,7 +75,59 @@ export default function CabinetSpotlight({ filers, trades }) {
         }
       />
       <div className="border border-stroke rounded-md bg-panel overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile/tablet: stacked rows with zebra. */}
+        <div className="lg:hidden divide-y divide-stroke_soft">
+          {spotlight.officials.slice(0, 10).map((o, i) => {
+            const netBias = o.trades ? ((o.buys - o.sells) / o.trades) * 100 : 0;
+            return (
+              <button
+                key={o.id}
+                onClick={() => navigate(`/filer/${o.id}`)}
+                className="w-full px-3 py-3 text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0 text-right">
+                      {i + 1}
+                    </span>
+                    <FilerAvatar filer={o} size={28} />
+                    <div className="min-w-0">
+                      <div className="text-small text-ink font-medium truncate">{o.name}</div>
+                      <div className="text-mini text-ink_muted truncate mt-[1px]">
+                        {o.level || "Official"}
+                        {o.agency ? ` · ${o.agency}` : ""}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0 tabular-nums">
+                    <div className="text-small text-ink font-medium">{fmtUSD(o.volume)}</div>
+                    <div className="text-mini text-ink_muted mt-[1px]">{fmtInt(o.trades)} trades</div>
+                  </div>
+                </div>
+                <div className="mt-1.5 ml-7 flex items-center gap-2 text-mini tabular-nums text-ink_muted">
+                  <span>
+                    <span className="text-buy">{o.buys}</span>
+                    <span className="text-ink_faint mx-[2px]">/</span>
+                    <span className="text-sell">{o.sells}</span>
+                  </span>
+                  <span
+                    className={
+                      netBias > 20
+                        ? "text-buy"
+                        : netBias < -20
+                          ? "text-sell"
+                          : "text-ink_faint"
+                    }
+                  >
+                    {netBias > 20 ? "buy bias" : netBias < -20 ? "sell bias" : "balanced"}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        {/* Desktop: full grid table. */}
+        <div className="hidden lg:block overflow-x-auto">
         <div className="min-w-[720px]">
         <div className={`grid grid-cols-[32px_minmax(0,1.3fr)_minmax(0,1fr)_70px_136px_110px] gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}>
           <span className="text-right">#</span>

@@ -323,14 +323,14 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
 // Header stat block: uppercase tracked label, prominent tabular value, muted
 // hint. Matches the typographic rhythm of the ImaginaryPortfolio card.
 function HeroStat({ label, value, hint, hintTone = "muted", title }) {
-  const hintCls = hintTone === "warn" ? "text-warn" : "text-ink_muted";
+  const hintCls = hintTone === "warn" ? "text-warn" : "text-ink_faint";
   return (
     <div title={title}>
-      <div className="text-mini font-medium text-ink_muted uppercase tracking-[0.06em]">{label}</div>
-      <div className="mt-1 text-[1.375rem] font-semibold tabular-nums tracking-[-0.012em] leading-none text-ink">
+      <div className="text-mini font-medium text-ink_muted">{label}</div>
+      <div className="mt-1 text-large sm:text-[1.375rem] font-semibold tabular-nums tracking-[-0.012em] leading-tight text-ink">
         {value}
       </div>
-      {hint && <div className={`mt-1.5 text-mini tabular-nums ${hintCls}`}>{hint}</div>}
+      {hint && <div className={`mt-0.5 text-mini tabular-nums ${hintCls}`}>{hint}</div>}
     </div>
   );
 }

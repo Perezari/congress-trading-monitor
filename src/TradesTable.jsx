@@ -354,8 +354,14 @@ function MobileTradeCard({ t, filersById }) {
     ? `${t.chamber === "senate" ? "Senate" : "House"} · ${t.party ?? "-"}${t.state ? ` · ${t.state}` : ""}`
     : `${t.level ?? ""} ${t.agency ?? ""}`.trim();
 
+  const cleanAsset = cleanAssetName(t.asset_name);
+  const dateLine =
+    t.transaction_date && t.filing_date
+      ? `${t.transaction_date} → ${t.filing_date}${t.days_to_file != null ? ` · ${t.days_to_file}d${t.is_late ? " late" : ""}` : ""}`
+      : t.transaction_date || t.filing_date || "";
+
   return (
-    <div className="px-3 py-3 even:bg-[lch(95.5%_0_282)]">
+    <div className="px-3 py-2.5 even:bg-[lch(95.5%_0_282)]">
       <div className="flex items-start justify-between gap-3">
         <button
           onClick={() => t.filer_id && navigate(`/filer/${t.filer_id}`)}
@@ -375,23 +381,33 @@ function MobileTradeCard({ t, filersById }) {
             )}
           </div>
         </button>
-        <div className="text-right shrink-0">
-          <div
-            className={`text-mini font-semibold uppercase tracking-[0.02em] ${isBuy ? "text-buy" : isSell ? "text-sell" : "text-ink_muted"}`}
-          >
-            {sideLabel}
+        <div className="text-right shrink-0 leading-tight">
+          <div className="flex items-baseline gap-1.5 justify-end">
+            <span
+              className={`text-mini font-semibold uppercase tracking-[0.02em] ${isBuy ? "text-buy" : isSell ? "text-sell" : "text-ink_muted"}`}
+            >
+              {sideLabel}
+            </span>
+            <span className="text-small font-medium text-ink tabular-nums">
+              {mid != null ? fmtUSD(mid) : "—"}
+            </span>
           </div>
-          <div className="text-small font-medium text-ink tabular-nums mt-[2px]">
-            {mid != null ? fmtUSD(mid) : "—"}
-          </div>
+          {t.excess_since != null && (
+            <div
+              className={`text-mini tabular-nums mt-[2px] ${t.excess_since >= 0 ? "text-buy" : "text-sell"}`}
+            >
+              {t.excess_since >= 0 ? "+" : ""}
+              {t.excess_since.toFixed(1)}% vs SPY
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="mt-2 flex items-center gap-1.5 min-w-0">
+      <div className="mt-1.5 ml-9 flex items-center gap-1.5 min-w-0">
         {t.ticker ? (
           <button
             onClick={() => navigate(`/ticker/${t.ticker}`)}
-            className="inline-flex items-center gap-1.5 hover:opacity-80 shrink-0"
+            className="inline-flex items-center hover:opacity-80 shrink-0"
           >
             <TickerBadge ticker={t.ticker} size="sm" />
           </button>
@@ -406,48 +422,38 @@ function MobileTradeCard({ t, filersById }) {
             {assetTag.label}
           </span>
         )}
-        <span className="text-mini text-ink_muted truncate min-w-0" title={t.asset_name}>
-          {cleanAssetName(t.asset_name)}
-        </span>
+        {cleanAsset && (
+          <span className="text-mini text-ink_muted truncate min-w-0" title={t.asset_name}>
+            {cleanAsset}
+          </span>
+        )}
       </div>
       {t.comment && (
-        <div className="text-mini text-ink_faint italic truncate mt-[2px]" title={t.comment}>
+        <div className="ml-9 text-mini text-ink_faint italic truncate mt-[1px]" title={t.comment}>
           {t.comment}
         </div>
       )}
 
-      <div className="mt-2 flex items-center justify-between gap-2 text-mini text-ink_muted tabular-nums">
-        <div className="flex items-center gap-2 min-w-0 flex-wrap">
-          <span className="font-mono whitespace-nowrap">Traded {t.transaction_date ?? "—"}</span>
-          {t.filing_date && (
-            <span className={`font-mono whitespace-nowrap ${t.is_late ? "text-warn font-medium" : ""}`}>
-              · Filed {t.filing_date}
-              {t.days_to_file != null && (
-                <span className="ml-1">({t.days_to_file}d{t.is_late ? " late" : ""})</span>
-              )}
-            </span>
-          )}
-          {t.excess_since != null && (
-            <span
-              className={`tabular-nums font-medium ${t.excess_since >= 0 ? "text-buy" : "text-sell"}`}
+      {(dateLine || t.doc_url) && (
+        <div className="mt-1.5 ml-9 flex items-center justify-between gap-2 text-mini text-ink_muted tabular-nums">
+          <span
+            className={`font-mono truncate ${t.is_late ? "text-warn font-medium" : ""}`}
+          >
+            {dateLine}
+          </span>
+          {t.doc_url && (
+            <a
+              href={t.doc_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-ink_muted hover:text-accent whitespace-nowrap shrink-0"
             >
-              {t.excess_since >= 0 ? "+" : ""}
-              {t.excess_since.toFixed(1)}% vs SPY
-            </span>
+              PDF&nbsp;↗
+            </a>
           )}
         </div>
-        {t.doc_url && (
-          <a
-            href={t.doc_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="text-ink_muted hover:text-accent whitespace-nowrap shrink-0"
-          >
-            PDF&nbsp;↗
-          </a>
-        )}
-      </div>
+      )}
     </div>
   );
 }
