@@ -2,7 +2,16 @@ import React, { useMemo, useState } from "react";
 import { FilerAvatar } from "./components/TablePrimitives";
 import { TickerBadge } from "./components/TickerBadge";
 import { navigate } from "./router";
-import { cleanAssetName, fmtInt, fmtUSD, Pill, TABLE_HEADER_CLS, TABLE_ZEBRA_CLS, txnColor } from "./ui";
+import {
+  cleanAssetName,
+  fmtAmountRange,
+  fmtInt,
+  fmtUSD,
+  Pill,
+  TABLE_HEADER_CLS,
+  TABLE_ZEBRA_CLS,
+  txnColor,
+} from "./ui";
 
 const COLUMNS = [
   { key: "filer_name", label: "Filer", align: "left", sortable: true, width: "minmax(200px,1.6fr)" },
@@ -130,9 +139,7 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
       {/* Mobile: stacked cards. Desktop (sm+): the original wide grid. */}
       <div className="lg:hidden divide-y divide-stroke_soft">
         {displayed.length === 0 && (
-          <div className="px-4 py-10 text-small text-ink_muted text-center">
-            No trades match the current filters.
-          </div>
+          <div className="px-4 py-10 text-small text-ink_muted text-center">No trades match the current filters.</div>
         )}
         {displayed.map((t) => (
           <MobileTradeCard key={t.id} t={t} filersById={filersById} />
@@ -235,10 +242,7 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                       {cleanAssetName(t.asset_name)}
                     </div>
                     {t.comment && (
-                      <div
-                        className="text-mini text-ink_faint truncate mt-[1px] italic"
-                        title={t.comment}
-                      >
+                      <div className="text-mini text-ink_faint truncate mt-[1px] italic" title={t.comment}>
                         {t.comment}
                       </div>
                     )}
@@ -251,11 +255,8 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                     {sideLabel}
                   </div>
 
-                  <span
-                    className="text-right text-ink tabular-nums"
-                    title={t.amount_range_label ?? ""}
-                  >
-                    {mid != null ? fmtUSD(mid) : "--"}
+                  <span className="text-right text-ink tabular-nums" title={t.amount_range_label ?? ""}>
+                    {fmtAmountRange(t)}
                   </span>
 
                   <div className="text-right text-ink_muted tabular-nums font-mono">{t.transaction_date ?? "--"}</div>
@@ -277,9 +278,7 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                     {t.days_to_file == null ? (
                       <span className="text-ink_faint">—</span>
                     ) : (
-                      <span className={t.is_late ? "text-warn font-medium" : "text-ink_muted"}>
-                        {t.days_to_file}d
-                      </span>
+                      <span className={t.is_late ? "text-warn font-medium" : "text-ink_muted"}>{t.days_to_file}d</span>
                     )}
                   </div>
 
@@ -376,9 +375,7 @@ function MobileTradeCard({ t, filersById }) {
               <span className="text-small text-ink font-medium truncate">{t.filer_name}</span>
               <OwnerChip owner={t.owner} />
             </div>
-            {officeLine && (
-              <div className="text-mini text-ink_muted truncate mt-[1px]">{officeLine}</div>
-            )}
+            {officeLine && <div className="text-mini text-ink_muted truncate mt-[1px]">{officeLine}</div>}
           </div>
         </button>
         <div className="text-right shrink-0 leading-tight">
@@ -388,14 +385,12 @@ function MobileTradeCard({ t, filersById }) {
             >
               {sideLabel}
             </span>
-            <span className="text-small font-medium text-ink tabular-nums">
-              {mid != null ? fmtUSD(mid) : "—"}
+            <span className="text-small font-medium text-ink tabular-nums" title={t.amount_range_label ?? ""}>
+              {fmtAmountRange(t)}
             </span>
           </div>
           {t.excess_since != null && (
-            <div
-              className={`text-mini tabular-nums mt-[2px] ${t.excess_since >= 0 ? "text-buy" : "text-sell"}`}
-            >
+            <div className={`text-mini tabular-nums mt-[2px] ${t.excess_since >= 0 ? "text-buy" : "text-sell"}`}>
               {t.excess_since >= 0 ? "+" : ""}
               {t.excess_since.toFixed(1)}% vs SPY
             </div>
@@ -436,11 +431,7 @@ function MobileTradeCard({ t, filersById }) {
 
       {(dateLine || t.doc_url) && (
         <div className="mt-1.5 ml-9 flex items-center justify-between gap-2 text-mini text-ink_muted tabular-nums">
-          <span
-            className={`font-mono truncate ${t.is_late ? "text-warn font-medium" : ""}`}
-          >
-            {dateLine}
-          </span>
+          <span className={`font-mono truncate ${t.is_late ? "text-warn font-medium" : ""}`}>{dateLine}</span>
           {t.doc_url && (
             <a
               href={t.doc_url}

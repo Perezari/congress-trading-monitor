@@ -79,6 +79,42 @@ export function fmtUSD(n, signed = false) {
   return `${s}$${abs}`;
 }
 
+// Compact USD value used inside a range — drops the dollar sign so "$15K - $50K"
+// renders as "$15-50K", and uses "M" where appropriate.
+function fmtShort(n) {
+  if (!Number.isFinite(n)) return "";
+  if (n >= 1e6) return `${(n / 1e6) % 1 === 0 ? n / 1e6 : (n / 1e6).toFixed(1)}M`;
+  if (n >= 1e3) return `${Math.round(n / 1e3)}K`;
+  return String(n);
+}
+
+// Render a PTR/278-T amount range as "$15-50K", "$1-5M", etc. Prefer the
+// numeric bounds; fall back to the verbatim label if the bounds aren't on
+// the trade; finally fall back to a midpoint placeholder. Used to distinguish
+// otherwise-identical-looking filing rows (e.g. Burgum's same-asset purchases
+// at $15K-50K vs $1K-15K).
+export function fmtAmountRange(t) {
+  const lo = t?.amount_range_low;
+  const hi = t?.amount_range_high;
+  if (Number.isFinite(lo) && Number.isFinite(hi)) {
+    if (lo === hi) return `$${fmtShort(lo)}`;
+    return `$${fmtShort(lo)}-${fmtShort(hi)}`;
+  }
+  if (t?.amount_range_label) {
+    // Compact verbatim labels: "$15,001 - $50,000" → "$15-50K", "Over $50,000,000" → "$50M+"
+    const overMatch = t.amount_range_label.match(/Over \$([\d,]+)/i);
+    if (overMatch) return `${fmtShort(parseInt(overMatch[1].replace(/,/g, ""), 10))}+`;
+    const m = t.amount_range_label.match(/\$([\d,]+)\s*-\s*\$([\d,]+)/);
+    if (m) {
+      const a = parseInt(m[1].replace(/,/g, ""), 10);
+      const b = parseInt(m[2].replace(/,/g, ""), 10);
+      return `$${fmtShort(a)}-${fmtShort(b)}`;
+    }
+    return t.amount_range_label;
+  }
+  return "--";
+}
+
 export function fmtInt(n) {
   if (!n && n !== 0) return "--";
   return n.toLocaleString();

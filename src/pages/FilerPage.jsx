@@ -5,7 +5,17 @@ import { FilerAvatar as AvatarPrimitive } from "../components/TablePrimitives";
 import { TickerBadge, TickerLabel } from "../components/TickerBadge";
 import { navigate } from "../router";
 import TradesTable from "../TradesTable";
-import { branchPill, Card, cleanAssetName, fmtInt, fmtUSD, Link, SectionHeader, TABLE_HEADER_CLS } from "../ui";
+import {
+  branchPill,
+  Card,
+  cleanAssetName,
+  fmtAmountRange,
+  fmtInt,
+  fmtUSD,
+  Link,
+  SectionHeader,
+  TABLE_HEADER_CLS,
+} from "../ui";
 
 function role(f) {
   if (!f) return "";
@@ -140,6 +150,10 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
           comment: t.comment,
           transaction_date: t.transaction_date,
           mid,
+          amount_range_low: t.amount_range_low,
+          amount_range_high: t.amount_range_high,
+          amount_range_label: t.amount_range_label,
+          row_index: t.row_index,
           excess: t.excess_since,
           ret: t.ret_since,
           doc_url: t.doc_url,
@@ -276,9 +290,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
               label="Median lag"
               value={`${stats.medianLag}d`}
               hint={
-                stats.lateShare != null && stats.lateShare > 0
-                  ? `${(stats.lateShare * 100).toFixed(0)}% late`
-                  : null
+                stats.lateShare != null && stats.lateShare > 0 ? `${(stats.lateShare * 100).toFixed(0)}% late` : null
               }
               hintTone={stats.lateShare != null && stats.lateShare >= 0.25 ? "warn" : "muted"}
               title={`${stats.late} of ${stats.count} filings were disclosed more than 45 days after the trade`}
@@ -384,8 +396,7 @@ function TickerAttributionSection({ rows }) {
                 </div>
                 <div className="mt-1.5 flex items-center justify-between gap-2 text-mini tabular-nums text-ink_muted">
                   <span>
-                    {r.total} trades ·{" "}
-                    <span className="text-buy">{r.buys}</span>
+                    {r.total} trades · <span className="text-buy">{r.buys}</span>
                     <span className="text-ink_faint mx-[2px]">/</span>
                     <span className="text-sell">{r.sells}</span>
                   </span>
@@ -512,10 +523,7 @@ function AlphaDriversSection({ drivers }) {
             const ex = d.excess ?? 0;
             const ret = d.ret ?? 0;
             return (
-              <div
-                key={d.id}
-                className="px-3 py-3 even:bg-[lch(95.5%_0_282)]"
-              >
+              <div key={d.id} className="px-3 py-3 even:bg-[lch(95.5%_0_282)]">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0">{i + 1}</span>
@@ -550,7 +558,9 @@ function AlphaDriversSection({ drivers }) {
                     <span className="font-mono whitespace-nowrap">
                       {d.transaction_date} · {holdingLabel(d.transaction_date)}
                     </span>
-                    <span className="text-ink whitespace-nowrap">{fmtUSD(d.mid)}</span>
+                    <span className="text-ink whitespace-nowrap" title={d.amount_range_label || undefined}>
+                      {fmtAmountRange(d)}
+                    </span>
                     <span className={`whitespace-nowrap ${ret >= 0 ? "text-buy" : "text-sell"}`}>
                       {ret >= 0 ? "+" : ""}
                       {ret.toFixed(0)}%
@@ -602,7 +612,11 @@ function AlphaDriversSection({ drivers }) {
                       onClick={() => d.ticker && navigate(`/ticker/${d.ticker}`)}
                       className="text-left hover:text-accent"
                     >
-                      {d.ticker ? <TickerLabel ticker={d.ticker} size="sm" /> : <span className="text-ink_faint">—</span>}
+                      {d.ticker ? (
+                        <TickerLabel ticker={d.ticker} size="sm" />
+                      ) : (
+                        <span className="text-ink_faint">—</span>
+                      )}
                     </button>
                     <div className="min-w-0">
                       <div className="text-ink_muted truncate" title={d.asset_name}>
@@ -616,7 +630,9 @@ function AlphaDriversSection({ drivers }) {
                     </div>
                     <span className="text-right text-ink_muted tabular-nums font-mono">{d.transaction_date}</span>
                     <span className="text-right text-ink_muted tabular-nums">{holdingLabel(d.transaction_date)}</span>
-                    <span className="text-right text-ink tabular-nums">{fmtUSD(d.mid)}</span>
+                    <span className="text-right text-ink tabular-nums" title={d.amount_range_label || undefined}>
+                      {fmtAmountRange(d)}
+                    </span>
                     <span className={`text-right tabular-nums ${ret >= 0 ? "text-buy" : "text-sell"}`}>
                       {ret >= 0 ? "+" : ""}
                       {ret.toFixed(0)}%
@@ -740,11 +756,7 @@ function ImaginaryPortfolio({ trades }) {
 
       <Card className="p-4 sm:p-5 mb-4">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-4 sm:gap-y-5">
-          <PortfolioStat
-            label="Portfolio value"
-            value={fmtUSD(data.value)}
-            hint={`from ${fmtUSD(data.cost)} cost`}
-          />
+          <PortfolioStat label="Portfolio value" value={fmtUSD(data.value)} hint={`from ${fmtUSD(data.cost)} cost`} />
           <PortfolioStat
             label="Unrealized gain"
             value={`${data.gain >= 0 ? "+" : ""}${fmtUSD(data.gain)}`}
@@ -835,9 +847,7 @@ function ImaginaryPortfolio({ trades }) {
                   <span className="text-right text-ink_muted tabular-nums font-mono text-mini">{p.firstDate}</span>
                   <span className="text-right tabular-nums text-ink_muted">{fmtUSD(p.cost)}</span>
                   <span className="text-right tabular-nums font-medium text-ink">{fmtUSD(p.value)}</span>
-                  <span
-                    className={`text-right tabular-nums font-medium ${p.gain >= 0 ? "text-buy" : "text-sell"}`}
-                  >
+                  <span className={`text-right tabular-nums font-medium ${p.gain >= 0 ? "text-buy" : "text-sell"}`}>
                     {p.gain >= 0 ? "+" : ""}
                     {p.gainPct.toFixed(0)}%
                   </span>

@@ -1,17 +1,12 @@
 import React, { useMemo } from "react";
 import { navigate } from "../router";
-import { cleanAssetName, fmtUSD, TABLE_HEADER_CLS } from "../ui";
+import { cleanAssetName, fmtAmountRange, TABLE_HEADER_CLS } from "../ui";
 import { FilerAvatar } from "./TablePrimitives";
 import { TickerBadge } from "./TickerBadge";
 
 // Latest activity feed — last N filings, sorted by filing_date desc.
 // Shows who just disclosed what, for the "check on the dataset" reader who
 // wants a pulse on what came in today vs what the leaderboards surface.
-function midpoint(t) {
-  return t.amount_range_low != null && t.amount_range_high != null
-    ? (t.amount_range_low + t.amount_range_high) / 2
-    : null;
-}
 
 function relativeDate(iso) {
   if (!iso) return "";
@@ -48,11 +43,11 @@ export default function LatestActivity({ trades, limit = 12 }) {
       </div>
       <div className="divide-y divide-stroke_soft">
         {rows.map((t) => {
-          const mid = midpoint(t);
           const tt = (t.transaction_type || "").toLowerCase();
           const isBuy = tt.includes("urchase") || tt === "p";
           const isSell = tt.includes("ale") || tt === "s";
           const side = isBuy ? "Buy" : isSell ? "Sell" : (t.transaction_type || "—").slice(0, 5);
+          const fullAsset = cleanAssetName(t.asset_name) || "";
           return (
             <button
               key={t.id}
@@ -62,15 +57,25 @@ export default function LatestActivity({ trades, limit = 12 }) {
               <div className="flex items-center gap-2 min-w-0">
                 <FilerAvatar filer={{ full_name: t.filer_name, chamber: t.chamber, branch: t.branch }} size={24} />
                 <div className="min-w-0 flex-1">
-                  <div className="text-small text-ink font-medium truncate">{t.filer_name}</div>
+                  <div className="text-small text-ink font-medium truncate flex items-center gap-1.5">
+                    <span className="truncate">{t.filer_name}</span>
+                    {t.row_index != null && (
+                      <span
+                        className="text-mini text-ink_faint font-normal tabular-nums shrink-0"
+                        title={`Filing row #${t.row_index}`}
+                      >
+                        #{t.row_index}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-1.5 mt-[1px]">
                     {t.ticker ? (
                       <TickerBadge ticker={t.ticker} size="sm" />
                     ) : (
                       <span className="text-mini text-ink_faint">—</span>
                     )}
-                    <span className="text-mini text-ink_muted truncate" title={t.asset_name}>
-                      {cleanAssetName(t.asset_name) || ""}
+                    <span className="text-mini text-ink_muted truncate" title={fullAsset}>
+                      {fullAsset}
                     </span>
                   </div>
                 </div>
@@ -78,7 +83,12 @@ export default function LatestActivity({ trades, limit = 12 }) {
               <span className={`text-mini font-medium ${isBuy ? "text-buy" : isSell ? "text-sell" : "text-ink_muted"}`}>
                 {side}
               </span>
-              <span className="text-small tabular-nums text-right text-ink">{mid != null ? fmtUSD(mid) : "—"}</span>
+              <span
+                className="text-small tabular-nums text-right text-ink whitespace-nowrap"
+                title={t.amount_range_label || undefined}
+              >
+                {fmtAmountRange(t)}
+              </span>
               <span className="text-mini tabular-nums text-right text-ink_muted whitespace-nowrap">
                 {relativeDate(t.filing_date)}
               </span>
