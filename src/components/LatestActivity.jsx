@@ -33,8 +33,9 @@ export default function LatestActivity({ trades, limit = 12 }) {
 
   return (
     <div className="border border-stroke rounded-md bg-panel overflow-hidden">
+      {/* Column header only renders at sm+ — mobile layout is a stacked card. */}
       <div
-        className={`grid grid-cols-[minmax(0,1fr)_56px_88px_88px] gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
+        className={`hidden sm:grid grid-cols-[minmax(0,1fr)_56px_88px_88px] gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
       >
         <span>Filer</span>
         <span>Side</span>
@@ -48,16 +49,23 @@ export default function LatestActivity({ trades, limit = 12 }) {
           const isSell = tt.includes("ale") || tt === "s";
           const side = isBuy ? "Buy" : isSell ? "Sell" : (t.transaction_type || "—").slice(0, 5);
           const fullAsset = cleanAssetName(t.asset_name) || "";
+          const sideColor = isBuy ? "text-buy" : isSell ? "text-sell" : "text-ink_muted";
           return (
             <button
               key={t.id}
               onClick={() => t.filer_id && navigate(`/filer/${t.filer_id}`)}
-              className="w-full grid grid-cols-[minmax(0,1fr)_56px_88px_88px] gap-3 px-4 py-[10px] items-center text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted"
+              className="w-full px-3 sm:px-4 py-[10px] text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted block sm:grid sm:grid-cols-[minmax(0,1fr)_56px_88px_88px] sm:gap-3 sm:items-center"
             >
-              <div className="flex items-center gap-2 min-w-0">
-                <FilerAvatar filer={{ full_name: t.filer_name, chamber: t.chamber, branch: t.branch }} size={24} />
-                <div className="min-w-0 flex-1">
-                  <div className="text-small text-ink font-medium truncate flex items-center gap-1.5">
+              {/* Filer block — same content on both layouts. Asset line wraps under
+                  filer name; on mobile the metadata column is on the right of the
+                  same flex row, on desktop the grid handles it. */}
+              <div className="flex sm:contents items-start gap-2 min-w-0">
+                <FilerAvatar
+                  filer={{ full_name: t.filer_name, chamber: t.chamber, branch: t.branch }}
+                  size={24}
+                />
+                <div className="min-w-0 flex-1 sm:flex-initial">
+                  <div className="text-small text-ink font-medium flex items-center gap-1.5 min-w-0">
                     <span className="truncate">{t.filer_name}</span>
                     {t.row_index != null && (
                       <span
@@ -68,7 +76,7 @@ export default function LatestActivity({ trades, limit = 12 }) {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 mt-[1px]">
+                  <div className="flex items-center gap-1.5 mt-[1px] min-w-0">
                     {t.ticker ? (
                       <TickerBadge ticker={t.ticker} size="sm" />
                     ) : (
@@ -79,17 +87,35 @@ export default function LatestActivity({ trades, limit = 12 }) {
                     </span>
                   </div>
                 </div>
+
+                {/* Mobile-only inline metadata: side + amount stacked over date. */}
+                <div className="flex flex-col items-end gap-[2px] sm:hidden shrink-0">
+                  <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+                    <span className={`text-mini font-medium ${sideColor}`}>{side}</span>
+                    <span
+                      className="text-small tabular-nums text-ink"
+                      title={t.amount_range_label || undefined}
+                    >
+                      {fmtAmountRange(t)}
+                    </span>
+                  </div>
+                  <span className="text-mini tabular-nums text-ink_muted">
+                    {relativeDate(t.filing_date)}
+                  </span>
+                </div>
               </div>
-              <span className={`text-mini font-medium ${isBuy ? "text-buy" : isSell ? "text-sell" : "text-ink_muted"}`}>
+
+              {/* Desktop-only grid cells — hidden on mobile (handled inline above). */}
+              <span className={`hidden sm:inline text-mini font-medium ${sideColor}`}>
                 {side}
               </span>
               <span
-                className="text-small tabular-nums text-right text-ink whitespace-nowrap"
+                className="hidden sm:inline text-small tabular-nums text-right text-ink whitespace-nowrap"
                 title={t.amount_range_label || undefined}
               >
                 {fmtAmountRange(t)}
               </span>
-              <span className="text-mini tabular-nums text-right text-ink_muted whitespace-nowrap">
+              <span className="hidden sm:inline text-mini tabular-nums text-right text-ink_muted whitespace-nowrap">
                 {relativeDate(t.filing_date)}
               </span>
             </button>
