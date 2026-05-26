@@ -116,7 +116,7 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
   }, [filers, returns, trades, prices]);
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 auto-rows-fr">
+    <div className="grid grid-cols-1 md:grid-cols-5 gap-3 auto-rows-fr">
       {data.mostActive && (
         <Card onClick={() => navigate(`/filer/${data.mostActive.id}`)}>
           <Metric label="Most active" />
