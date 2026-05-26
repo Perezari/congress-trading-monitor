@@ -35,11 +35,12 @@ export default function LatestActivity({ trades, limit = 12 }) {
     <div className="border border-stroke rounded-md bg-panel overflow-hidden">
       {/* Column header only renders at sm+ — mobile layout is a stacked card. */}
       <div
-        className={`hidden sm:grid grid-cols-[minmax(0,1fr)_56px_88px_88px] gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
+        className={`hidden sm:grid grid-cols-[minmax(0,1fr)_56px_88px_64px_88px] gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
       >
         <span>Filer</span>
         <span>Side</span>
         <span className="tabular-nums text-right">Amount</span>
+        <span className="tabular-nums text-right">vs SPY</span>
         <span className="tabular-nums text-right">Filed</span>
       </div>
       <div className="divide-y divide-stroke_soft">
@@ -54,7 +55,7 @@ export default function LatestActivity({ trades, limit = 12 }) {
             <button
               key={t.id}
               onClick={() => t.filer_id && navigate(`/filer/${t.filer_id}`)}
-              className="w-full px-3 sm:px-4 py-[10px] text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted block sm:grid sm:grid-cols-[minmax(0,1fr)_56px_88px_88px] sm:gap-3 sm:items-center"
+              className="w-full px-3 sm:px-4 py-[10px] text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted block sm:grid sm:grid-cols-[minmax(0,1fr)_56px_88px_64px_88px] sm:gap-3 sm:items-center"
             >
               {/* Filer block — a SINGLE grid cell on desktop (col 1, 1fr) that
                   contains avatar + name + asset inline. On mobile this is the
@@ -85,7 +86,7 @@ export default function LatestActivity({ trades, limit = 12 }) {
                   </div>
                 </div>
 
-                {/* Mobile-only inline metadata: side + amount stacked over date. */}
+                {/* Mobile-only inline metadata: side + amount, alpha, then date. */}
                 <div className="flex flex-col items-end gap-[2px] sm:hidden shrink-0">
                   <div className="flex items-baseline gap-1.5 whitespace-nowrap">
                     <span className={`text-mini font-medium ${sideColor}`}>{side}</span>
@@ -93,7 +94,17 @@ export default function LatestActivity({ trades, limit = 12 }) {
                       {fmtAmountRange(t)}
                     </span>
                   </div>
-                  <span className="text-mini tabular-nums text-ink_muted">{relativeDate(t.filing_date)}</span>
+                  <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+                    {t.excess_since != null && (
+                      <span
+                        className={`text-mini tabular-nums font-medium ${t.excess_since >= 0 ? "text-buy" : "text-sell"}`}
+                      >
+                        {t.excess_since >= 0 ? "+" : ""}
+                        {t.excess_since.toFixed(1)}% vs SPY
+                      </span>
+                    )}
+                    <span className="text-mini tabular-nums text-ink_muted">{relativeDate(t.filing_date)}</span>
+                  </div>
                 </div>
               </div>
 
@@ -104,6 +115,16 @@ export default function LatestActivity({ trades, limit = 12 }) {
                 title={t.amount_range_label || undefined}
               >
                 {fmtAmountRange(t)}
+              </span>
+              <span
+                className={`hidden sm:inline text-mini tabular-nums text-right whitespace-nowrap ${
+                  t.excess_since == null ? "text-ink_faint" : t.excess_since >= 0 ? "text-buy" : "text-sell"
+                }`}
+                title="Stock's excess return vs SPY since the transaction date"
+              >
+                {t.excess_since == null
+                  ? "—"
+                  : `${t.excess_since >= 0 ? "+" : ""}${t.excess_since.toFixed(1)}%`}
               </span>
               <span className="hidden sm:inline text-mini tabular-nums text-right text-ink_muted whitespace-nowrap">
                 {relativeDate(t.filing_date)}
