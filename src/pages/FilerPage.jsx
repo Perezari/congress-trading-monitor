@@ -6,6 +6,7 @@ import { TickerBadge, TickerLabel } from "../components/TickerBadge";
 import { navigate } from "../router";
 import TradesTable from "../TradesTable";
 import {
+  bestAssetNameByTicker,
   branchPill,
   Card,
   cleanAssetName,
@@ -309,7 +310,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
       <ImaginaryPortfolio trades={trades} />
 
       {stats.weightedExcess != null && stats.alphaDrivers && stats.alphaDrivers.length > 0 && (
-        <AlphaDriversSection drivers={stats.alphaDrivers} />
+        <AlphaDriversSection drivers={stats.alphaDrivers} trades={trades} />
       )}
 
       {stats.tickerAttribution && stats.tickerAttribution.filter((t) => t.ticker).length > 0 && (
@@ -502,7 +503,8 @@ function isLongHold(dateStr) {
 // how concentrated the excess return really is.
 const DRIVER_GRID = "28px 84px minmax(0,1fr) 92px 60px 80px 80px 80px 44px";
 
-function AlphaDriversSection({ drivers }) {
+function AlphaDriversSection({ drivers, trades }) {
+  const bestNames = useMemo(() => bestAssetNameByTicker(trades), [trades]);
   const top = drivers.slice(0, 8);
   const topShare = top.reduce((s, d) => s + d.share, 0);
   const topTicker = top[0]?.ticker;
@@ -537,8 +539,11 @@ function AlphaDriversSection({ drivers }) {
                         <span className="text-ink_faint">—</span>
                       )}
                     </button>
-                    <span className="text-mini text-ink_muted truncate" title={d.asset_name}>
-                      {cleanAssetName(d.asset_name)}
+                    <span
+                      className="text-mini text-ink_muted truncate"
+                      title={bestNames.get(d.ticker) || d.asset_name || d.ticker}
+                    >
+                      {bestNames.get(d.ticker) || cleanAssetName(d.asset_name) || d.ticker}
                     </span>
                   </div>
                   <span
@@ -619,8 +624,11 @@ function AlphaDriversSection({ drivers }) {
                       )}
                     </button>
                     <div className="min-w-0">
-                      <div className="text-ink_muted truncate" title={d.asset_name}>
-                        {cleanAssetName(d.asset_name)}
+                      <div
+                        className="text-ink_muted truncate"
+                        title={bestNames.get(d.ticker) || d.asset_name || d.ticker}
+                      >
+                        {bestNames.get(d.ticker) || cleanAssetName(d.asset_name) || d.ticker}
                       </div>
                       {d.comment && (
                         <div className="text-mini text-ink_faint truncate italic mt-[1px]" title={d.comment}>
@@ -687,6 +695,7 @@ function PortfolioStat({ label, value, valueTone = "text-ink", hint, hintTone = 
 // as a feature rather than a caveat — "If Marshall never sold his 2017 NVDA,
 // he'd have a $3M tech portfolio today." The math is mid_amount × ret_since.
 function ImaginaryPortfolio({ trades }) {
+  const bestNames = useMemo(() => bestAssetNameByTicker(trades), [trades]);
   const data = useMemo(() => {
     const buys = trades.filter((t) => {
       const tt = (t.transaction_type || "").toLowerCase();
@@ -751,7 +760,7 @@ function ImaginaryPortfolio({ trades }) {
     <div className="mb-10">
       <SectionHeader
         title="Imaginary portfolio"
-        subtitle="What this portfolio would be worth today if every disclosed buy was held to today's close — no sales, no rebalancing. Positions reported as sold are not deducted."
+        subtitle="Every disclosed buy held to today's close. Sells are not subtracted."
       />
 
       <Card className="p-4 sm:p-5 mb-4">
@@ -791,8 +800,11 @@ function ImaginaryPortfolio({ trades }) {
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0">{i + 1}</span>
                   <TickerBadge ticker={p.ticker} size="sm" />
-                  <span className="text-mini text-ink_muted truncate" title={p.asset_name}>
-                    {cleanAssetName(p.asset_name)}
+                  <span
+                    className="text-mini text-ink_muted truncate"
+                    title={bestNames.get(p.ticker) || p.asset_name || p.ticker}
+                  >
+                    {bestNames.get(p.ticker) || cleanAssetName(p.asset_name) || p.ticker}
                   </span>
                 </div>
                 <span
@@ -840,8 +852,11 @@ function ImaginaryPortfolio({ trades }) {
                     <div className="w-[58px] shrink-0">
                       <TickerBadge ticker={p.ticker} size="sm" />
                     </div>
-                    <span className="text-ink_muted truncate text-mini" title={p.asset_name}>
-                      {cleanAssetName(p.asset_name)}
+                    <span
+                      className="text-ink_muted truncate text-mini"
+                      title={bestNames.get(p.ticker) || p.asset_name || p.ticker}
+                    >
+                      {bestNames.get(p.ticker) || cleanAssetName(p.asset_name) || p.ticker}
                     </span>
                   </div>
                   <span className="text-right text-ink_muted tabular-nums font-mono text-mini">{p.firstDate}</span>

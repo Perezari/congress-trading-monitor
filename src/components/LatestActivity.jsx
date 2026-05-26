@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { navigate } from "../router";
-import { cleanAssetName, fmtAmountRange, TABLE_HEADER_CLS } from "../ui";
+import { bestAssetNameByTicker, cleanAssetName, fmtAmountRange, TABLE_HEADER_CLS } from "../ui";
 import { FilerAvatar } from "./TablePrimitives";
 import { TickerBadge } from "./TickerBadge";
 
@@ -28,6 +28,7 @@ export default function LatestActivity({ trades, limit = 12 }) {
       .sort((a, b) => (a.filing_date < b.filing_date ? 1 : a.filing_date > b.filing_date ? -1 : 0))
       .slice(0, limit);
   }, [trades, limit]);
+  const bestNames = useMemo(() => bestAssetNameByTicker(trades), [trades]);
 
   if (!rows.length) return null;
 
@@ -49,7 +50,7 @@ export default function LatestActivity({ trades, limit = 12 }) {
           const isBuy = tt.includes("urchase") || tt === "p";
           const isSell = tt.includes("ale") || tt === "s";
           const side = isBuy ? "Buy" : isSell ? "Sell" : (t.transaction_type || "—").slice(0, 5);
-          const fullAsset = cleanAssetName(t.asset_name) || "";
+          const fullAsset = bestNames.get(t.ticker) || cleanAssetName(t.asset_name) || "";
           const sideColor = isBuy ? "text-buy" : isSell ? "text-sell" : "text-ink_muted";
           return (
             <button

@@ -40,6 +40,61 @@ export function SortHeader({ label, sortKey, sort, setSort, align = "left" }) {
 // noise of full vertical gridlines (which feel Excel-era on a Linear-style canvas).
 export const TABLE_ZEBRA_CLS = "[&>*:nth-child(even)]:bg-muted/30";
 
+// House PTR PDFs sometimes drop the company-name token at row boundaries,
+// leaving fragments like ", Inc. - Common Stock" or empty strings on a
+// subset of trades for a ticker. We pick the most-frequent CLEAN candidate
+// per ticker (and break ties toward the shortest), since duplicated forms
+// across many trades are nearly always the canonical equity name and noisy
+// outliers (comment-field bleed, account-label leakage, option contract
+// strings) tend to appear only once. Memoized by trades array reference.
+const _bestNameCache = new WeakMap();
+function tidyAssetCandidate(raw) {
+  if (!raw) return "";
+  let s = cleanAssetName(raw);
+  if (!s) return "";
+  // Trim option-contract / date trailers
+  s = s
+    .replace(/\s+Option\s+Type:.*$/i, "")
+    .replace(/\s+Strike\s+price:.*$/i, "")
+    .replace(/\s+Expires?:.*$/i, "")
+    .replace(/\s+\d{2}\/\d{2}\/\d{4}.*$/, "")
+    .trim();
+  // Strip leading "F S: New" / "New" PTR account-state labels
+  s = s.replace(/^(?:F\s+S\s*:\s*)?New\s+(?=[A-Z])/, "").trim();
+  return s;
+}
+function isPlausibleCompanyName(s) {
+  if (!s) return false;
+  if (/^[,.]/.test(s)) return false;
+  if (s.length < 3 || s.length > 80) return false;
+  // Reject comment-field bleed (PTR comments often start with "D:" or contain
+  // narrative sentence structure)
+  if (/^D:\s/i.test(s)) return false;
+  if (/\b(?:I\s+(?:received|did|am)|managed account|the time|guidance)\b/i.test(s)) return false;
+  return true;
+}
+export function bestAssetNameByTicker(trades) {
+  if (!trades) return new Map();
+  if (_bestNameCache.has(trades)) return _bestNameCache.get(trades);
+  const counts = new Map(); // ticker -> Map<name, count>
+  for (const t of trades) {
+    if (!t.ticker || !t.asset_name) continue;
+    const cleaned = tidyAssetCandidate(t.asset_name);
+    if (!isPlausibleCompanyName(cleaned)) continue;
+    if (!counts.has(t.ticker)) counts.set(t.ticker, new Map());
+    const m = counts.get(t.ticker);
+    m.set(cleaned, (m.get(cleaned) ?? 0) + 1);
+  }
+  const out = new Map();
+  for (const [ticker, m] of counts) {
+    // Sort by frequency desc, then by length asc (shorter = less noisy).
+    const best = [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].length - b[0].length)[0];
+    if (best) out.set(ticker, best[0]);
+  }
+  _bestNameCache.set(trades, out);
+  return out;
+}
+
 // Strip the parser garbage that frequently leaks into House PTR asset_name strings.
 // Examples handled:
 //   "Tesla, Inc. (Tsla) [sT]s (partial)08/03/2018..." → "Tesla, Inc."

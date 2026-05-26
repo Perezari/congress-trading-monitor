@@ -5,7 +5,7 @@ import { FilerAvatar } from "../components/TablePrimitives";
 import { TickerBadge } from "../components/TickerBadge";
 import { navigate } from "../router";
 import TradesTable from "../TradesTable";
-import { Card, fmtInt, fmtUSD, Link, SectionHeader } from "../ui";
+import { bestAssetNameByTicker, Card, fmtInt, fmtUSD, Link, SectionHeader } from "../ui";
 
 export default function TickerPage({ symbol, filersById }) {
   const [data, setData] = useState(null);
@@ -24,6 +24,7 @@ export default function TickerPage({ symbol, filersById }) {
   const trades = data?.trades ?? [];
   const ticker = data?.ticker ?? symbol;
   const price = data?.price ?? null;
+  const fullName = useMemo(() => bestAssetNameByTicker(trades).get(ticker) ?? null, [trades, ticker]);
 
   const stats = useMemo(() => {
     let buys = 0,
@@ -111,13 +112,29 @@ export default function TickerPage({ symbol, filersById }) {
         <span className="text-ink font-semibold">{ticker}</span>
       </nav>
 
-      <div className="flex items-baseline justify-between flex-wrap gap-4 mb-8">
-        <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-start justify-between flex-wrap gap-4 mb-8">
+        <div className="flex items-start gap-3 flex-wrap min-w-0">
           <TickerBadge ticker={ticker} size="lg" />
-          <span className="text-regular text-ink_muted">
-            traded by <span className="text-ink font-medium">{stats.filerCount}</span> filers,{" "}
-            <span className="text-ink font-medium">{fmtInt(stats.count)}</span> times
-          </span>
+          <div className="min-w-0">
+            {fullName && (
+              <div className="text-large font-semibold text-ink leading-tight" title={fullName}>
+                {fullName}
+              </div>
+            )}
+            <div className="text-regular text-ink_muted mt-[2px]">
+              traded by <span className="text-ink font-medium">{stats.filerCount}</span> filers,{" "}
+              <span className="text-ink font-medium">{fmtInt(stats.count)}</span> times
+              <a
+                href={`https://finance.yahoo.com/quote/${encodeURIComponent(ticker)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-2 text-mini text-ink_faint hover:text-accent hover:underline"
+                title={`Open ${ticker} on Yahoo Finance`}
+              >
+                Yahoo Finance ↗
+              </a>
+            </div>
+          </div>
         </div>
         {price && <PriceTicker price={price} />}
       </div>
