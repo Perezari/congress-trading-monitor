@@ -61,6 +61,20 @@ function tidyAssetCandidate(raw) {
     .trim();
   // Strip leading "F S: New" / "New" PTR account-state labels
   s = s.replace(/^(?:F\s+S\s*:\s*)?New\s+(?=[A-Z])/, "").trim();
+  // "S O: <account label> D: <description-or-equity>" — keep the post-"D:" tail.
+  const dCut = s.match(/\bD:\s*([^]*)$/);
+  if (dCut && dCut[1].trim().length > 4) s = dCut[1].trim();
+  // "DESCRIPTION: Shares received in spinoff from Pentair PLC (PNR) JTnVent Electric"
+  // → drop everything up to and including the parenthetical, keep equity tail.
+  s = s.replace(/^DESCRIPTI?O?N:.*?\)\s+/i, "").trim();
+  // Account/family-name prefixes glued to the equity name via owner code:
+  //   "Thomas C MacArthur and Deborah A MacArthur JTnVent Electric plc"
+  //   "MacArthur Family 2008 Irr Tr FBo David MacArthur JTnVent..."
+  // Split at the owner-code/lowercase boundary and keep the right side.
+  const ownerSplit = s.match(/\b(?:DC|SP|JT|DJ|SA)([a-z][\w.& ]+)$/);
+  if (ownerSplit) s = ownerSplit[1].trim();
+  // After splits the leading char may be lowercase (e.g. "nVent..."). That's fine
+  // for real equity names like nVent / iShares / eBay.
   return s;
 }
 function isPlausibleCompanyName(s) {
