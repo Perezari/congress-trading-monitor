@@ -59,8 +59,8 @@ export default function LatestActivity({ trades, limit = 12 }) {
               className="w-full px-3 sm:px-4 py-[10px] text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted block sm:grid sm:grid-cols-[minmax(0,1fr)_56px_88px_64px_88px] sm:gap-3 sm:items-center"
             >
               {/* Filer block — a SINGLE grid cell on desktop (col 1, 1fr) that
-                  contains avatar + name + asset inline. On mobile this is the
-                  left side of a flex row with metadata pinned right. */}
+                  contains avatar + name + asset inline. On mobile this is a
+                  3-row stack: name+time, ticker+company, then side/amount/alpha. */}
               <div className="flex items-start gap-2 min-w-0">
                 <FilerAvatar filer={{ full_name: t.filer_name, chamber: t.chamber, branch: t.branch }} size={24} />
                 <div className="min-w-0 flex-1">
@@ -74,6 +74,10 @@ export default function LatestActivity({ trades, limit = 12 }) {
                         #{t.row_index}
                       </span>
                     )}
+                    {/* Mobile-only time, pinned right of the name row. */}
+                    <span className="text-mini tabular-nums text-ink_muted ml-auto sm:hidden shrink-0">
+                      {relativeDate(t.filing_date)}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-[1px] min-w-0">
                     {t.ticker ? (
@@ -85,26 +89,22 @@ export default function LatestActivity({ trades, limit = 12 }) {
                       {fullAsset}
                     </span>
                   </div>
-                </div>
-
-                {/* Mobile-only inline metadata: side + amount, alpha, then date. */}
-                <div className="flex flex-col items-end gap-[2px] sm:hidden shrink-0">
-                  <div className="flex items-baseline gap-1.5 whitespace-nowrap">
-                    <span className={`text-mini font-medium ${sideColor}`}>{side}</span>
-                    <span className="text-small tabular-nums text-ink" title={t.amount_range_label || undefined}>
+                  {/* Mobile-only side/amount/alpha row. */}
+                  <div className="sm:hidden mt-1 flex items-baseline gap-1.5 whitespace-nowrap text-mini">
+                    <span className={`font-medium ${sideColor}`}>{side}</span>
+                    <span className="text-ink_faint">·</span>
+                    <span className="tabular-nums text-ink" title={t.amount_range_label || undefined}>
                       {fmtAmountRange(t)}
                     </span>
-                  </div>
-                  <div className="flex items-baseline gap-1.5 whitespace-nowrap">
                     {t.excess_since != null && (
-                      <span
-                        className={`text-mini tabular-nums font-medium ${t.excess_since >= 0 ? "text-buy" : "text-sell"}`}
-                      >
-                        {t.excess_since >= 0 ? "+" : ""}
-                        {t.excess_since.toFixed(1)}% vs SPY
-                      </span>
+                      <>
+                        <span className="text-ink_faint">·</span>
+                        <span className={`tabular-nums font-medium ${t.excess_since >= 0 ? "text-buy" : "text-sell"}`}>
+                          {t.excess_since >= 0 ? "+" : ""}
+                          {t.excess_since.toFixed(1)}% vs SPY
+                        </span>
+                      </>
                     )}
-                    <span className="text-mini tabular-nums text-ink_muted">{relativeDate(t.filing_date)}</span>
                   </div>
                 </div>
               </div>
@@ -123,9 +123,7 @@ export default function LatestActivity({ trades, limit = 12 }) {
                 }`}
                 title="Stock's excess return vs SPY since the transaction date"
               >
-                {t.excess_since == null
-                  ? "—"
-                  : `${t.excess_since >= 0 ? "+" : ""}${t.excess_since.toFixed(1)}%`}
+                {t.excess_since == null ? "—" : `${t.excess_since >= 0 ? "+" : ""}${t.excess_since.toFixed(1)}%`}
               </span>
               <span className="hidden sm:inline text-mini tabular-nums text-right text-ink_muted whitespace-nowrap">
                 {relativeDate(t.filing_date)}

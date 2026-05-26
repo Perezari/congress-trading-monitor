@@ -67,12 +67,7 @@ export default function TickersPage({ data }) {
       )}
 
       <div className="flex flex-wrap items-center gap-1.5 mb-4">
-        <InlineSearchInput
-          value={qs.q}
-          onChange={(v) => setQs({ q: v })}
-          placeholder="Filter ticker…"
-          width={200}
-        />
+        <InlineSearchInput value={qs.q} onChange={(v) => setQs({ q: v })} placeholder="Filter ticker…" width={200} />
       </div>
 
       <Card className="overflow-hidden">
@@ -98,9 +93,7 @@ export default function TickersPage({ data }) {
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0 text-right">
-                      {i + 1}
-                    </span>
+                    <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0 text-right">{i + 1}</span>
                     <TickerLabel ticker={t.ticker} size="sm" />
                   </div>
                   <div className="text-right shrink-0 tabular-nums">
@@ -119,91 +112,120 @@ export default function TickersPage({ data }) {
                     )}
                   </div>
                 </div>
-                <div className="mt-1.5 ml-7 flex items-center justify-between gap-2 text-mini tabular-nums text-ink_muted">
+                <div className="mt-1.5 ml-7 text-mini tabular-nums text-ink_muted">
                   <span>
-                    {t.trade_count.toLocaleString()} trades · {t.filer_count} filers
+                    {t.trade_count.toLocaleString()} trades
+                    <span className="text-ink_faint mx-1">·</span>
+                    {t.filer_count} filers
+                    <span className="text-ink_faint mx-1">·</span>
+                    {fmtUSD(t.est_volume)}
                   </span>
-                  <span>
-                    <span className="text-buy">{t.purchases}</span>
-                    <span className="text-ink_faint mx-[2px]">/</span>
-                    <span className="text-sell">{t.sales}</span>
-                    <span className="text-ink_faint"> · {fmtUSD(t.est_volume)}</span>
-                  </span>
+                </div>
+                <div className="mt-[2px] ml-7 text-mini tabular-nums">
+                  <span className="text-buy">{t.purchases} buys</span>
+                  <span className="text-ink_faint mx-1.5">·</span>
+                  <span className="text-sell">{t.sales} sells</span>
                 </div>
               </button>
             );
           })}
         </div>
         <div className="hidden lg:block overflow-x-auto">
-        <div className="min-w-[880px]">
-        <div
-          className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
-          style={{ gridTemplateColumns: GRID }}
-        >
-          <span className="text-right">#</span>
-          <span>Ticker</span>
-          <SortHeader label="Trades" sortKey="trades" sort={qs.sort} setSort={(v) => setQs({ sort: v })} align="right" />
-          <span className="tabular-nums text-right">Last · Δ1d</span>
-          <SortHeader label="Filers" sortKey="filers" sort={qs.sort} setSort={(v) => setQs({ sort: v })} align="right" />
-          <SortHeader label="Buy / Sell mix" sortKey="buys" sort={qs.sort} setSort={(v) => setQs({ sort: v })} align="right" />
-          <SortHeader label="Est. volume" sortKey="volume" sort={qs.sort} setSort={(v) => setQs({ sort: v })} align="right" />
-        </div>
-        <div className="divide-y divide-stroke_soft">
-          {filtered.length === 0 && (
-            <div className="px-4 py-8 text-small text-ink_muted text-center">
-              No tickers match.{" "}
-              <button onClick={() => setQs({ q: "", sort: "trades" })} className="text-accent hover:underline">
-                Clear filters
-              </button>
-              .
+          <div className="min-w-[880px]">
+            <div
+              className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
+              style={{ gridTemplateColumns: GRID }}
+            >
+              <span className="text-right">#</span>
+              <span>Ticker</span>
+              <SortHeader
+                label="Trades"
+                sortKey="trades"
+                sort={qs.sort}
+                setSort={(v) => setQs({ sort: v })}
+                align="right"
+              />
+              <span className="tabular-nums text-right">Last · Δ1d</span>
+              <SortHeader
+                label="Filers"
+                sortKey="filers"
+                sort={qs.sort}
+                setSort={(v) => setQs({ sort: v })}
+                align="right"
+              />
+              <SortHeader
+                label="Buy / Sell mix"
+                sortKey="buys"
+                sort={qs.sort}
+                setSort={(v) => setQs({ sort: v })}
+                align="right"
+              />
+              <SortHeader
+                label="Est. volume"
+                sortKey="volume"
+                sort={qs.sort}
+                setSort={(v) => setQs({ sort: v })}
+                align="right"
+              />
             </div>
-          )}
-          {filtered.slice(0, 1000).map((t, i) => {
-            const p = prices[t.ticker];
-            const change = dailyChange(p);
-            return (
-              <button
-                key={t.ticker}
-                onClick={() => navigate(`/ticker/${t.ticker}`)}
-                className="w-full grid gap-3 px-4 py-[10px] items-center text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
-                style={{ gridTemplateColumns: GRID }}
-              >
-                <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
-
-                <TickerLabel ticker={t.ticker} size="sm" />
-
-                <span className="tabular-nums text-right text-small text-ink">{t.trade_count.toLocaleString()}</span>
-
-                <div className="text-right tabular-nums">
-                  {p?.latest?.close != null ? (
-                    <>
-                      <span className="text-small text-ink font-mono">${p.latest.close.toFixed(2)}</span>
-                      {change != null && (
-                        <span className={`text-mini ml-1 ${change >= 0 ? "text-buy" : "text-sell"}`}>
-                          {change >= 0 ? "+" : ""}
-                          {change.toFixed(1)}%
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <span className="text-small text-ink_faint">—</span>
-                  )}
+            <div className="divide-y divide-stroke_soft">
+              {filtered.length === 0 && (
+                <div className="px-4 py-8 text-small text-ink_muted text-center">
+                  No tickers match.{" "}
+                  <button onClick={() => setQs({ q: "", sort: "trades" })} className="text-accent hover:underline">
+                    Clear filters
+                  </button>
+                  .
                 </div>
+              )}
+              {filtered.slice(0, 1000).map((t, i) => {
+                const p = prices[t.ticker];
+                const change = dailyChange(p);
+                return (
+                  <button
+                    key={t.ticker}
+                    onClick={() => navigate(`/ticker/${t.ticker}`)}
+                    className="w-full grid gap-3 px-4 py-[10px] items-center text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+                    style={{ gridTemplateColumns: GRID }}
+                  >
+                    <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
 
-                <span className="tabular-nums text-right text-small text-ink_muted">{t.filer_count}</span>
+                    <TickerLabel ticker={t.ticker} size="sm" />
 
-                <span className="text-mini tabular-nums text-right whitespace-nowrap">
-                  <span className="text-buy">{t.purchases}</span>
-                  <span className="text-ink_faint mx-[2px]">/</span>
-                  <span className="text-sell">{t.sales}</span>
-                </span>
+                    <span className="tabular-nums text-right text-small text-ink">
+                      {t.trade_count.toLocaleString()}
+                    </span>
 
-                <span className="tabular-nums text-right text-small text-ink_muted">{fmtUSD(t.est_volume)}</span>
-              </button>
-            );
-          })}
-        </div>
-        </div>
+                    <div className="text-right tabular-nums">
+                      {p?.latest?.close != null ? (
+                        <>
+                          <span className="text-small text-ink font-mono">${p.latest.close.toFixed(2)}</span>
+                          {change != null && (
+                            <span className={`text-mini ml-1 ${change >= 0 ? "text-buy" : "text-sell"}`}>
+                              {change >= 0 ? "+" : ""}
+                              {change.toFixed(1)}%
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-small text-ink_faint">—</span>
+                      )}
+                    </div>
+
+                    <span className="tabular-nums text-right text-small text-ink_muted">{t.filer_count}</span>
+
+                    <span className="text-mini tabular-nums text-right whitespace-nowrap">
+                      <span className="text-buy">{t.purchases}</span>
+                      <span className="text-ink_faint mx-[2px]">/</span>
+                      <span className="text-sell">{t.sales}</span>
+                    </span>
+
+                    <span className="tabular-nums text-right text-small text-ink_muted">{fmtUSD(t.est_volume)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
         {filtered.length > 1000 && (
           <div className="px-4 py-2 border-t border-stroke text-mini text-ink_muted text-center">

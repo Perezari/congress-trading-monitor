@@ -58,10 +58,7 @@ export default function FilersPage({ data }) {
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 pt-8 pb-16">
-      <SectionHeader
-        title="Filers"
-        subtitle={`${fmtInt(filtered.length)} of ${fmtInt(enrichedFilers.length)}`}
-      />
+      <SectionHeader title="Filers" subtitle={`${fmtInt(filtered.length)} of ${fmtInt(enrichedFilers.length)}`} />
 
       <div className="flex flex-wrap items-center gap-1.5 mb-4">
         <InlineSearchInput
@@ -119,145 +116,145 @@ function FilersTable({ filtered, sort, setSort, onClear }) {
               onClick={() => navigate(`/filer/${f.id}`)}
               className="w-full px-3 py-3 text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
             >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0 text-right">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-2 min-w-0 flex-1">
+                  <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0 text-right mt-[1px]">
                     {i + 1}
                   </span>
                   <FilerAvatar filer={f} size={28} />
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="text-small text-ink font-medium truncate">{f.full_name}</div>
                     <div className="text-mini text-ink_muted truncate mt-[1px]">{officeLine}</div>
                   </div>
                 </div>
-                <div className="text-right shrink-0">
-                  {alpha != null ? (
-                    <div
-                      className={`text-small font-semibold tabular-nums ${alpha >= 0 ? "text-buy" : "text-sell"}`}
-                    >
-                      {alpha >= 0 ? "+" : ""}
-                      {alpha.toFixed(1)}% vs SPY
-                    </div>
-                  ) : (
-                    <div className="text-small text-ink_faint">no SPY data</div>
-                  )}
-                  <div className="text-mini text-ink_muted tabular-nums mt-[1px]">
-                    {f.trade_count.toLocaleString()} trades
-                  </div>
-                </div>
-              </div>
-              <div className="mt-2 ml-7 flex items-center justify-between gap-2 text-mini tabular-nums text-ink_muted">
-                <span>
-                  <span className="text-buy">{f.purchases || 0}</span>
-                  <span className="text-ink_faint mx-[2px]">/</span>
-                  <span className="text-sell">{f.sales || 0}</span>
-                  {f.est_volume ? <span className="text-ink_faint"> · {fmtUSD(f.est_volume)}</span> : null}
-                </span>
-                {f.late_filings > 0 && (
-                  <span
-                    className={
-                      f.late_filings / f.trade_count >= 0.5 ? "text-warn font-medium" : "text-ink_muted"
-                    }
+                {alpha != null ? (
+                  <div
+                    className={`text-small font-semibold tabular-nums shrink-0 ${alpha >= 0 ? "text-buy" : "text-sell"}`}
                   >
-                    {((f.late_filings / f.trade_count) * 100).toFixed(0)}% late ({f.late_filings})
-                  </span>
+                    {alpha >= 0 ? "+" : ""}
+                    {alpha.toFixed(1)}%
+                  </div>
+                ) : (
+                  <div className="text-mini text-ink_faint shrink-0">no data</div>
                 )}
               </div>
+              <div className="mt-1.5 ml-9 text-mini tabular-nums text-ink_muted">
+                <span>
+                  {f.trade_count.toLocaleString()} trades
+                  <span className="text-ink_faint mx-1">·</span>
+                  <span className="text-buy">{f.purchases || 0} buys</span>
+                  <span className="text-ink_faint mx-1">·</span>
+                  <span className="text-sell">{f.sales || 0} sells</span>
+                  {f.est_volume ? (
+                    <>
+                      <span className="text-ink_faint mx-1">·</span>
+                      {fmtUSD(f.est_volume)}
+                    </>
+                  ) : null}
+                </span>
+              </div>
+              {f.late_filings > 0 && (
+                <div className="mt-[2px] ml-9 text-mini tabular-nums">
+                  <span className={f.late_filings / f.trade_count >= 0.5 ? "text-warn font-medium" : "text-ink_muted"}>
+                    {((f.late_filings / f.trade_count) * 100).toFixed(0)}% late ({f.late_filings})
+                  </span>
+                </div>
+              )}
             </button>
           );
         })}
       </div>
       {/* Desktop: full grid table. */}
       <div className="hidden lg:block overflow-x-auto">
-      <div className="min-w-[900px]">
-      <div
-        className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
-        style={{ gridTemplateColumns: GRID }}
-      >
-        <span className="text-right">#</span>
-        <span>Filer</span>
-        <SortHeader label="Trades" sortKey="trades" sort={sort} setSort={setSort} align="right" />
-        <span className="tabular-nums text-right">Buy / Sell mix</span>
-        <SortHeader label="Est. volume" sortKey="volume" sort={sort} setSort={setSort} align="right" />
-        <SortHeader label="Late share" sortKey="late" sort={sort} setSort={setSort} align="right" />
-        <SortHeader label="vs SPY" sortKey="alpha" sort={sort} setSort={setSort} align="right" />
-      </div>
-      <div className="divide-y divide-stroke_soft">
-        {empty}
-        {filtered.slice(0, 500).map((f, i) => {
-          const alpha = f.weighted_excess;
-          return (
-            <button
-              key={f.id}
-              onClick={() => navigate(`/filer/${f.id}`)}
-              className="w-full grid gap-3 px-4 py-[10px] items-center text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
-              style={{ gridTemplateColumns: GRID }}
-            >
-              <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
+        <div className="min-w-[900px]">
+          <div
+            className={`grid gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
+            style={{ gridTemplateColumns: GRID }}
+          >
+            <span className="text-right">#</span>
+            <span>Filer</span>
+            <SortHeader label="Trades" sortKey="trades" sort={sort} setSort={setSort} align="right" />
+            <span className="tabular-nums text-right">Buy / Sell mix</span>
+            <SortHeader label="Est. volume" sortKey="volume" sort={sort} setSort={setSort} align="right" />
+            <SortHeader label="Late share" sortKey="late" sort={sort} setSort={setSort} align="right" />
+            <SortHeader label="vs SPY" sortKey="alpha" sort={sort} setSort={setSort} align="right" />
+          </div>
+          <div className="divide-y divide-stroke_soft">
+            {empty}
+            {filtered.slice(0, 500).map((f, i) => {
+              const alpha = f.weighted_excess;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => navigate(`/filer/${f.id}`)}
+                  className="w-full grid gap-3 px-4 py-[10px] items-center text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+                  style={{ gridTemplateColumns: GRID }}
+                >
+                  <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
 
-              <div className="flex items-center gap-2.5 min-w-0">
-                <FilerAvatar filer={f} size={32} />
-                <div className="min-w-0">
-                  <div className="text-small text-ink font-medium truncate">{f.full_name}</div>
-                  <div className="text-mini text-ink_muted truncate mt-[1px]">
-                    {f.branch === "executive"
-                      ? `${f.level ?? ""} ${f.agency ?? ""}`.trim() || "Executive"
-                      : `${f.chamber === "senate" ? "Senate" : "House"} · ${f.party ?? "-"} · ${f.state ?? "-"}`}
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <FilerAvatar filer={f} size={32} />
+                    <div className="min-w-0">
+                      <div className="text-small text-ink font-medium truncate">{f.full_name}</div>
+                      <div className="text-mini text-ink_muted truncate mt-[1px]">
+                        {f.branch === "executive"
+                          ? `${f.level ?? ""} ${f.agency ?? ""}`.trim() || "Executive"
+                          : `${f.chamber === "senate" ? "Senate" : "House"} · ${f.party ?? "-"} · ${f.state ?? "-"}`}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              <span className="tabular-nums text-right text-small text-ink">{f.trade_count.toLocaleString()}</span>
+                  <span className="tabular-nums text-right text-small text-ink">{f.trade_count.toLocaleString()}</span>
 
-              <span className="text-mini text-ink_muted tabular-nums text-right whitespace-nowrap">
-                <span className="text-buy">{f.purchases || 0}</span>
-                <span className="text-ink_faint mx-[2px]">/</span>
-                <span className="text-sell">{f.sales || 0}</span>
-              </span>
+                  <span className="text-mini text-ink_muted tabular-nums text-right whitespace-nowrap">
+                    <span className="text-buy">{f.purchases || 0}</span>
+                    <span className="text-ink_faint mx-[2px]">/</span>
+                    <span className="text-sell">{f.sales || 0}</span>
+                  </span>
 
-              <span className="tabular-nums text-right text-small text-ink_muted">
-                {f.est_volume ? fmtUSD(f.est_volume) : "—"}
-              </span>
+                  <span className="tabular-nums text-right text-small text-ink_muted">
+                    {f.est_volume ? fmtUSD(f.est_volume) : "—"}
+                  </span>
 
-              <div className="flex items-center justify-end gap-2 tabular-nums">
-                {f.late_filings > 0 ? (
-                  <>
-                    <span
-                      className={`text-small font-semibold tabular-nums ${
-                        f.late_filings / f.trade_count >= 0.5 ? "text-warn" : "text-ink_muted"
-                      }`}
-                    >
-                      {((f.late_filings / f.trade_count) * 100).toFixed(0)}%
-                    </span>
-                    <span className="text-mini text-ink_faint tabular-nums whitespace-nowrap min-w-[34px] text-right">
-                      {f.late_filings}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-small text-ink_faint">—</span>
-                )}
-              </div>
+                  <div className="flex items-center justify-end gap-2 tabular-nums">
+                    {f.late_filings > 0 ? (
+                      <>
+                        <span
+                          className={`text-small font-semibold tabular-nums ${
+                            f.late_filings / f.trade_count >= 0.5 ? "text-warn" : "text-ink_muted"
+                          }`}
+                        >
+                          {((f.late_filings / f.trade_count) * 100).toFixed(0)}%
+                        </span>
+                        <span className="text-mini text-ink_faint tabular-nums whitespace-nowrap min-w-[34px] text-right">
+                          {f.late_filings}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-small text-ink_faint">—</span>
+                    )}
+                  </div>
 
-              <div className="flex items-center justify-end gap-2 tabular-nums">
-                {alpha == null ? (
-                  <span className="text-small text-ink_faint">—</span>
-                ) : (
-                  <>
-                    <span
-                      className={`text-small font-semibold tabular-nums ${alpha >= 0 ? "text-buy" : "text-sell"}`}
-                    >
-                      {alpha >= 0 ? "+" : ""}
-                      {alpha.toFixed(1)}%
-                    </span>
-                    <SampleChip n={f.scored_buys} />
-                  </>
-                )}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-      </div>
+                  <div className="flex items-center justify-end gap-2 tabular-nums">
+                    {alpha == null ? (
+                      <span className="text-small text-ink_faint">—</span>
+                    ) : (
+                      <>
+                        <span
+                          className={`text-small font-semibold tabular-nums ${alpha >= 0 ? "text-buy" : "text-sell"}`}
+                        >
+                          {alpha >= 0 ? "+" : ""}
+                          {alpha.toFixed(1)}%
+                        </span>
+                        <SampleChip n={f.scored_buys} />
+                      </>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
       {filtered.length > 500 && (
         <div className="px-4 py-2 border-t border-stroke text-mini text-ink_muted text-center">
