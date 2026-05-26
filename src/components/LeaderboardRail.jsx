@@ -12,7 +12,7 @@ function Card({ children, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="flex-1 min-w-[150px] sm:min-w-[180px] text-left p-3.5 rounded-md border border-stroke bg-panel hover:border-ink_faint hover:shadow-card transition-all flex flex-col"
+      className="text-left p-3.5 rounded-md border border-stroke bg-panel hover:border-ink_faint hover:shadow-card transition-all flex flex-col gap-1.5 h-full"
     >
       {children}
     </button>
@@ -21,7 +21,7 @@ function Card({ children, onClick }) {
 
 function Metric({ label }) {
   return (
-    <div className="mb-2">
+    <div>
       <span className="text-mini text-ink_muted font-medium">{label}</span>
     </div>
   );
@@ -116,7 +116,7 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
   }, [filers, returns, trades, prices]);
 
   return (
-    <div className="flex gap-3 flex-wrap">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 auto-rows-fr">
       {data.mostActive && (
         <Card onClick={() => navigate(`/filer/${data.mostActive.id}`)}>
           <Metric label="Most active" />
@@ -163,7 +163,7 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
               </span>
             )}
           </div>
-          <div className="text-mini text-ink_muted tabular-nums mt-1">
+          <div className="text-mini text-ink_muted tabular-nums">
             {fmtInt(data.hottestStock.trades)} trades in last 60 days
           </div>
         </Card>
@@ -178,7 +178,7 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
             </span>
             <span className="text-mini text-ink_muted">median · 45d limit</span>
           </div>
-          <div className="text-mini tabular-nums mt-1">
+          <div className="text-mini tabular-nums">
             <span className="text-warn font-semibold">
               {((stats.disclosureLag.lateCount / stats.disclosureLag.tradesWithLag) * 100).toFixed(0)}%
             </span>
@@ -194,7 +194,7 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
             <span className="text-[1rem] font-semibold text-ink tabular-nums">{fmtUSD(data.biggestTrade.mid)}</span>
             {data.biggestTrade.ticker && <TickerBadge ticker={data.biggestTrade.ticker} size="sm" />}
           </div>
-          <div className="text-mini text-ink_muted truncate mt-1">
+          <div className="text-mini text-ink_muted truncate">
             {data.biggestTrade.filer_name}
             {data.biggestTrade.date && <span className="text-ink_faint"> · {data.biggestTrade.date}</span>}
           </div>
