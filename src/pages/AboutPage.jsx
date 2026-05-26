@@ -34,9 +34,7 @@ const STEPS = [
   },
 ];
 
-export default function AboutPage({ data }) {
-  const stats = data.stats;
-
+export default function AboutPage() {
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 pt-8 pb-20">
       <div className="max-w-3xl">
@@ -44,15 +42,10 @@ export default function AboutPage({ data }) {
         <p className="text-regular text-ink_muted">
           An open dataset that parses congressional and executive branch financial disclosures into a searchable,
           sortable, visual format. Filings are sourced and monitored with{" "}
-          <a
-            href="https://kadoa.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-accent hover:underline"
-          >
+          <a href="https://kadoa.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
             kadoa.com
-          </a>
-          {" "}and code is open source on{" "}
+          </a>{" "}
+          and code is open source on{" "}
           <a
             href="https://github.com/kadoa-org/congress-trading-monitor"
             target="_blank"
@@ -64,18 +57,6 @@ export default function AboutPage({ data }) {
           . Every transaction links back to the original filing PDF so any claim on this site can be verified against
           the source document.
         </p>
-        {stats?.generatedAt && (
-          <div className="mt-3 text-mini text-ink_muted flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-[6px] h-[6px] rounded-full bg-buy animate-pulse" />
-              Last updated {stats.generatedAt.slice(0, 10)}
-            </span>
-            <span className="text-ink_faint">·</span>
-            <span>
-              Latest filing <span className="font-mono text-ink">{stats.dateRange?.to}</span>
-            </span>
-          </div>
-        )}
       </div>
 
       <div id="law" className="mt-12 max-w-3xl scroll-mt-20">
