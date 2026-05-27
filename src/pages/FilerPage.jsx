@@ -759,7 +759,7 @@ function ImaginaryPortfolio({ trades }) {
   return (
     <div className="mb-10">
       <SectionHeader
-        title="Hold-to-today value"
+        title="Live portfolio"
         subtitle="Real disclosed buys priced at today's close. Assumes nothing was sold."
       />
 
