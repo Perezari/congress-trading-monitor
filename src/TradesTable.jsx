@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { FilerAvatar } from "./components/TablePrimitives";
 import { TickerBadge } from "./components/TickerBadge";
-import { navigate } from "./router";
 import {
   cleanAssetName,
   fmtAmountRange,
   fmtInt,
   fmtUSD,
   Pill,
+  RowLink,
   TABLE_HEADER_CLS,
   TABLE_ZEBRA_CLS,
   txnColor,
@@ -195,9 +195,9 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                   className="grid gap-3 px-3 py-[10px] items-center even:bg-[lch(95.5%_0_282)] hover:bg-muted/70 text-small"
                   style={{ gridTemplateColumns: GRID_TEMPLATE }}
                 >
-                  <button
-                    onClick={() => t.filer_id && navigate(`/filer/${t.filer_id}`)}
-                    className="flex items-center gap-2 min-w-0 text-left"
+                  <RowLink
+                    to={t.filer_id ? `/filer/${t.filer_id}` : undefined}
+                    className="flex items-center gap-2 min-w-0 text-left text-ink no-underline"
                   >
                     <FilerAvatar
                       filer={filerPhoto ?? { full_name: t.filer_name, chamber: t.chamber, branch: t.branch }}
@@ -214,16 +214,16 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                           : `${t.level ?? ""} ${t.agency ?? ""}`.trim()}
                       </div>
                     </div>
-                  </button>
+                  </RowLink>
 
                   <div className="flex items-center gap-1.5 min-w-0">
                     {t.ticker ? (
-                      <button
-                        onClick={() => navigate(`/ticker/${t.ticker}`)}
+                      <RowLink
+                        to={`/ticker/${t.ticker}`}
                         className="inline-flex items-center gap-1.5 truncate hover:opacity-80"
                       >
                         <TickerBadge ticker={t.ticker} size="sm" />
-                      </button>
+                      </RowLink>
                     ) : (
                       <span className="text-ink_faint">—</span>
                     )}
@@ -362,9 +362,9 @@ function MobileTradeCard({ t, filersById }) {
   return (
     <div className="px-3 py-2.5 even:bg-[lch(95.5%_0_282)]">
       <div className="flex items-start justify-between gap-3">
-        <button
-          onClick={() => t.filer_id && navigate(`/filer/${t.filer_id}`)}
-          className="flex items-center gap-2 min-w-0 text-left flex-1"
+        <RowLink
+          to={t.filer_id ? `/filer/${t.filer_id}` : undefined}
+          className="flex items-center gap-2 min-w-0 text-left flex-1 text-ink no-underline"
         >
           <FilerAvatar
             filer={filerPhoto ?? { full_name: t.filer_name, chamber: t.chamber, branch: t.branch }}
@@ -377,7 +377,7 @@ function MobileTradeCard({ t, filersById }) {
             </div>
             {officeLine && <div className="text-mini text-ink_muted truncate mt-[1px]">{officeLine}</div>}
           </div>
-        </button>
+        </RowLink>
         <div className="text-right shrink-0 leading-tight">
           <div className="flex items-baseline gap-1.5 justify-end">
             <span
@@ -400,12 +400,9 @@ function MobileTradeCard({ t, filersById }) {
 
       <div className="mt-1.5 ml-9 flex items-center gap-1.5 min-w-0">
         {t.ticker ? (
-          <button
-            onClick={() => navigate(`/ticker/${t.ticker}`)}
-            className="inline-flex items-center hover:opacity-80 shrink-0"
-          >
+          <RowLink to={`/ticker/${t.ticker}`} className="inline-flex items-center hover:opacity-80 shrink-0">
             <TickerBadge ticker={t.ticker} size="sm" />
-          </button>
+          </RowLink>
         ) : (
           <span className="text-ink_faint shrink-0">—</span>
         )}

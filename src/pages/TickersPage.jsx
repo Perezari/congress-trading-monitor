@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { InlineSearchInput } from "../components/FilterBar";
 import { TickerBadge, TickerLabel } from "../components/TickerBadge";
-import { navigate, useQueryState } from "../router";
-import { Card, fmtInt, fmtUSD, SectionHeader, SortHeader, TABLE_HEADER_CLS } from "../ui";
+import { useQueryState } from "../router";
+import { Card, fmtInt, fmtUSD, RowLink, SectionHeader, SortHeader, TABLE_HEADER_CLS } from "../ui";
 
 const SORTS = {
   trades: { label: "Most trades", fn: (a, b) => b.trade_count - a.trade_count },
@@ -47,10 +47,10 @@ export default function TickersPage({ data }) {
           {mostWidelyHeld.map((t) => {
             const change = dailyChange(prices[t.ticker]);
             return (
-              <button
+              <RowLink
                 key={t.ticker}
-                onClick={() => navigate(`/ticker/${t.ticker}`)}
-                className="inline-flex items-center gap-2 h-8 px-2 rounded-md border border-stroke bg-panel hover:border-ink_faint hover:bg-muted transition-colors"
+                to={`/ticker/${t.ticker}`}
+                className="inline-flex items-center gap-2 h-8 px-2 rounded-md border border-stroke bg-panel text-ink no-underline hover:border-ink_faint hover:bg-muted transition-colors"
               >
                 <TickerBadge ticker={t.ticker} size="sm" />
                 {change != null && (
@@ -60,7 +60,7 @@ export default function TickersPage({ data }) {
                   </span>
                 )}
                 <span className="text-mini text-ink_faint tabular-nums">· {t.filer_count}</span>
-              </button>
+              </RowLink>
             );
           })}
         </div>
@@ -86,10 +86,10 @@ export default function TickersPage({ data }) {
             const p = prices[t.ticker];
             const change = dailyChange(p);
             return (
-              <button
+              <RowLink
                 key={t.ticker}
-                onClick={() => navigate(`/ticker/${t.ticker}`)}
-                className="w-full px-3 py-3 text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+                to={`/ticker/${t.ticker}`}
+                className="block w-full px-3 py-3 text-left text-ink no-underline even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -126,7 +126,7 @@ export default function TickersPage({ data }) {
                   <span className="text-ink_faint mx-1.5">·</span>
                   <span className="text-sell">{t.sales} sells</span>
                 </div>
-              </button>
+              </RowLink>
             );
           })}
         </div>
@@ -182,10 +182,10 @@ export default function TickersPage({ data }) {
                 const p = prices[t.ticker];
                 const change = dailyChange(p);
                 return (
-                  <button
+                  <RowLink
                     key={t.ticker}
-                    onClick={() => navigate(`/ticker/${t.ticker}`)}
-                    className="w-full grid gap-3 px-4 py-[10px] items-center text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+                    to={`/ticker/${t.ticker}`}
+                    className="w-full grid gap-3 px-4 py-[10px] items-center text-left text-ink no-underline even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
                     style={{ gridTemplateColumns: GRID }}
                   >
                     <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
@@ -221,7 +221,7 @@ export default function TickersPage({ data }) {
                     </span>
 
                     <span className="tabular-nums text-right text-small text-ink_muted">{fmtUSD(t.est_volume)}</span>
-                  </button>
+                  </RowLink>
                 );
               })}
             </div>

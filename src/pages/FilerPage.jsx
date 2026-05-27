@@ -3,7 +3,6 @@ import FilterBar, { applyFilters, defaultFilters } from "../components/FilterBar
 import PersonalTimeline from "../components/PersonalTimeline";
 import { FilerAvatar as AvatarPrimitive } from "../components/TablePrimitives";
 import { TickerBadge, TickerLabel } from "../components/TickerBadge";
-import { navigate } from "../router";
 import TradesTable from "../TradesTable";
 import {
   bestAssetNameByTicker,
@@ -14,6 +13,7 @@ import {
   fmtInt,
   fmtUSD,
   Link,
+  RowLink,
   SectionHeader,
   TABLE_HEADER_CLS,
 } from "../ui";
@@ -379,10 +379,10 @@ function TickerAttributionSection({ rows }) {
           {top.map((r, i) => {
             const alpha = r.tickerAlpha;
             return (
-              <button
+              <RowLink
                 key={r.ticker}
-                onClick={() => navigate(`/ticker/${r.ticker}`)}
-                className="w-full px-3 py-3 text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+                to={`/ticker/${r.ticker}`}
+                className="block w-full px-3 py-3 text-left text-ink no-underline even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -417,7 +417,7 @@ function TickerAttributionSection({ rows }) {
                       : `${(r.tickerHitRate * 100).toFixed(0)}% hit · ${r.wins}/${r.scored}`}
                   </span>
                 </div>
-              </button>
+              </RowLink>
             );
           })}
         </div>
@@ -438,10 +438,10 @@ function TickerAttributionSection({ rows }) {
               {top.map((r, i) => {
                 const alpha = r.tickerAlpha;
                 return (
-                  <button
+                  <RowLink
                     key={r.ticker}
-                    onClick={() => navigate(`/ticker/${r.ticker}`)}
-                    className="w-full grid gap-3 px-4 py-[10px] items-center text-left text-small even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+                    to={`/ticker/${r.ticker}`}
+                    className="w-full grid gap-3 px-4 py-[10px] items-center text-left text-small text-ink no-underline even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
                     style={{ gridTemplateColumns: TICKER_GRID }}
                   >
                     <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
@@ -472,7 +472,7 @@ function TickerAttributionSection({ rows }) {
                     >
                       {alpha == null ? "—" : `${alpha >= 0 ? "+" : ""}${alpha.toFixed(0)}%`}
                     </span>
-                  </button>
+                  </RowLink>
                 );
               })}
             </div>
@@ -529,16 +529,16 @@ function AlphaDriversSection({ drivers, trades }) {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0">{i + 1}</span>
-                    <button
-                      onClick={() => d.ticker && navigate(`/ticker/${d.ticker}`)}
-                      className="hover:opacity-80 shrink-0"
+                    <RowLink
+                      to={d.ticker ? `/ticker/${d.ticker}` : undefined}
+                      className="hover:opacity-80 shrink-0 text-ink no-underline"
                     >
                       {d.ticker ? (
                         <TickerLabel ticker={d.ticker} size="sm" />
                       ) : (
                         <span className="text-ink_faint">—</span>
                       )}
-                    </button>
+                    </RowLink>
                     <span
                       className="text-mini text-ink_muted truncate"
                       title={bestNames.get(d.ticker) || d.asset_name || d.ticker}
@@ -613,16 +613,16 @@ function AlphaDriversSection({ drivers, trades }) {
                     style={{ gridTemplateColumns: DRIVER_GRID }}
                   >
                     <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
-                    <button
-                      onClick={() => d.ticker && navigate(`/ticker/${d.ticker}`)}
-                      className="text-left hover:text-accent"
+                    <RowLink
+                      to={d.ticker ? `/ticker/${d.ticker}` : undefined}
+                      className="text-left hover:text-accent text-ink no-underline"
                     >
                       {d.ticker ? (
                         <TickerLabel ticker={d.ticker} size="sm" />
                       ) : (
                         <span className="text-ink_faint">—</span>
                       )}
-                    </button>
+                    </RowLink>
                     <div className="min-w-0">
                       <div
                         className="text-ink_muted truncate"
@@ -791,10 +791,10 @@ function ImaginaryPortfolio({ trades }) {
         {/* Mobile: stacked rows with zebra striping. Desktop: full grid. */}
         <div className="lg:hidden divide-y divide-stroke_soft">
           {data.holdings.slice(0, 15).map((p, i) => (
-            <button
+            <RowLink
               key={p.ticker}
-              onClick={() => navigate(`/ticker/${p.ticker}`)}
-              className="w-full px-3 py-3 text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+              to={`/ticker/${p.ticker}`}
+              className="block w-full px-3 py-3 text-left text-ink no-underline even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -822,7 +822,7 @@ function ImaginaryPortfolio({ trades }) {
                   <span className="text-ink_faint"> · {p.weight.toFixed(0)}%</span>
                 </span>
               </div>
-            </button>
+            </RowLink>
           ))}
         </div>
         <div className="hidden lg:block overflow-x-auto">
@@ -841,10 +841,10 @@ function ImaginaryPortfolio({ trades }) {
             </div>
             <div className="divide-y divide-stroke_soft">
               {data.holdings.slice(0, 15).map((p, i) => (
-                <button
+                <RowLink
                   key={p.ticker}
-                  onClick={() => navigate(`/ticker/${p.ticker}`)}
-                  className="w-full grid gap-3 px-4 py-[10px] items-center text-left text-small hover:bg-muted/70"
+                  to={`/ticker/${p.ticker}`}
+                  className="w-full grid gap-3 px-4 py-[10px] items-center text-left text-small text-ink no-underline hover:bg-muted/70"
                   style={{ gridTemplateColumns: HOLDINGS_GRID }}
                 >
                   <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
@@ -867,7 +867,7 @@ function ImaginaryPortfolio({ trades }) {
                     {p.gainPct.toFixed(0)}%
                   </span>
                   <span className="tabular-nums text-right text-ink_muted">{p.weight.toFixed(0)}%</span>
-                </button>
+                </RowLink>
               ))}
             </div>
           </div>

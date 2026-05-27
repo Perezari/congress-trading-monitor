@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { InlineSearchInput, SingleSelectChip } from "../components/FilterBar";
 import { FilerAvatar, SampleChip } from "../components/TablePrimitives";
-import { navigate, useQueryState } from "../router";
-import { Card, fmtInt, fmtUSD, SectionHeader, SortHeader, TABLE_HEADER_CLS } from "../ui";
+import { useQueryState } from "../router";
+import { Card, fmtInt, fmtUSD, RowLink, SectionHeader, SortHeader, TABLE_HEADER_CLS } from "../ui";
 
 const SORTS = {
   trades: { label: "Most trades", fn: (a, b) => b.trade_count - a.trade_count },
@@ -111,10 +111,10 @@ function FilersTable({ filtered, sort, setSort, onClear }) {
               ? `${f.level ?? ""} ${f.agency ?? ""}`.trim() || "Executive"
               : `${f.chamber === "senate" ? "Senate" : "House"} · ${f.party ?? "-"} · ${f.state ?? "-"}`;
           return (
-            <button
+            <RowLink
               key={f.id}
-              onClick={() => navigate(`/filer/${f.id}`)}
-              className="w-full px-3 py-3 text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+              to={`/filer/${f.id}`}
+              className="block w-full px-3 py-3 text-left text-ink no-underline even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-2 min-w-0 flex-1">
@@ -160,7 +160,7 @@ function FilersTable({ filtered, sort, setSort, onClear }) {
                   </span>
                 </div>
               )}
-            </button>
+            </RowLink>
           );
         })}
       </div>
@@ -184,10 +184,10 @@ function FilersTable({ filtered, sort, setSort, onClear }) {
             {filtered.slice(0, 500).map((f, i) => {
               const alpha = f.weighted_excess;
               return (
-                <button
+                <RowLink
                   key={f.id}
-                  onClick={() => navigate(`/filer/${f.id}`)}
-                  className="w-full grid gap-3 px-4 py-[10px] items-center text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+                  to={`/filer/${f.id}`}
+                  className="w-full grid gap-3 px-4 py-[10px] items-center text-left text-ink no-underline even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
                   style={{ gridTemplateColumns: GRID }}
                 >
                   <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
@@ -250,7 +250,7 @@ function FilersTable({ filtered, sort, setSort, onClear }) {
                       </>
                     )}
                   </div>
-                </button>
+                </RowLink>
               );
             })}
           </div>

@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
-import { navigate } from "../router";
-import { bestAssetNameByTicker, cleanAssetName, fmtAmountRange, TABLE_HEADER_CLS } from "../ui";
+import { bestAssetNameByTicker, cleanAssetName, fmtAmountRange, RowLink, TABLE_HEADER_CLS } from "../ui";
 import { FilerAvatar } from "./TablePrimitives";
 import { TickerBadge } from "./TickerBadge";
 
@@ -53,10 +52,10 @@ export default function LatestActivity({ trades, limit = 12 }) {
           const fullAsset = bestNames.get(t.ticker) || cleanAssetName(t.asset_name) || "";
           const sideColor = isBuy ? "text-buy" : isSell ? "text-sell" : "text-ink_muted";
           return (
-            <button
+            <RowLink
               key={t.id}
-              onClick={() => t.filer_id && navigate(`/filer/${t.filer_id}`)}
-              className="w-full px-3 sm:px-4 py-[10px] text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted block sm:grid sm:grid-cols-[minmax(0,1fr)_56px_88px_64px_88px] sm:gap-3 sm:items-center"
+              to={t.filer_id ? `/filer/${t.filer_id}` : undefined}
+              className="w-full px-3 sm:px-4 py-[10px] text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted block sm:grid sm:grid-cols-[minmax(0,1fr)_56px_88px_64px_88px] sm:gap-3 sm:items-center text-ink no-underline"
             >
               {/* Filer block — a SINGLE grid cell on desktop (col 1, 1fr) that
                   contains avatar + name + asset inline. On mobile this is a
@@ -128,7 +127,7 @@ export default function LatestActivity({ trades, limit = 12 }) {
               <span className="hidden sm:inline text-mini tabular-nums text-right text-ink_muted whitespace-nowrap">
                 {relativeDate(t.filing_date)}
               </span>
-            </button>
+            </RowLink>
           );
         })}
       </div>

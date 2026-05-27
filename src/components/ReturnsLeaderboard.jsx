@@ -1,6 +1,5 @@
 import React from "react";
-import { navigate } from "../router";
-import { TABLE_HEADER_CLS } from "../ui";
+import { RowLink, TABLE_HEADER_CLS } from "../ui";
 import { FilerAvatar, RankBadge, SampleChip } from "./TablePrimitives";
 
 function role(f) {
@@ -35,10 +34,10 @@ export default function ReturnsLeaderboard({ returns }) {
           const ex = f.weighted_excess;
           const exSign = ex >= 0 ? "+" : "";
           return (
-            <button
+            <RowLink
               key={f.id}
-              onClick={() => navigate(`/filer/${f.id}`)}
-              className="w-full grid grid-cols-[28px_minmax(0,1fr)_96px_56px] gap-3 px-4 py-[10px] items-center text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted"
+              to={`/filer/${f.id}`}
+              className="w-full grid grid-cols-[28px_minmax(0,1fr)_96px_56px] gap-3 px-4 py-[10px] items-center text-left text-ink no-underline even:bg-[lch(95.5%_0_282)] hover:bg-muted"
             >
               <RankBadge rank={i + 1} />
               <div className="flex items-center gap-2.5 min-w-0">
@@ -57,7 +56,7 @@ export default function ReturnsLeaderboard({ returns }) {
               <div className="text-right">
                 <SampleChip n={f.scored_buys} />
               </div>
-            </button>
+            </RowLink>
           );
         })}
       </div>

@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import { navigate } from "../router";
 import { fmtInt, fmtUSD } from "../ui";
 import { FilerAvatar } from "./TablePrimitives";
 import { TickerBadge } from "./TickerBadge";
@@ -118,7 +117,7 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-3 auto-rows-fr">
       {data.mostActive && (
-        <Card onClick={() => navigate(`/filer/${data.mostActive.id}`)}>
+        <Card to={`/filer/${data.mostActive.id}`}>
           <Metric label="Most active" />
           <div className="flex items-center gap-2.5">
             <FilerAvatar filer={data.mostActive} size={32} />
@@ -131,7 +130,7 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
       )}
 
       {data.highestAlpha && (
-        <Card onClick={() => navigate(`/filer/${data.highestAlpha.id}`)}>
+        <Card to={`/filer/${data.highestAlpha.id}`}>
           <Metric label="Biggest outperformer" />
           <div className="flex items-center gap-2.5">
             <FilerAvatar filer={data.highestAlpha} size={32} />
@@ -150,7 +149,7 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
       )}
 
       {data.hottestStock && (
-        <Card onClick={() => navigate(`/ticker/${data.hottestStock.ticker}`)}>
+        <Card to={`/ticker/${data.hottestStock.ticker}`}>
           <Metric label="Hot stock (60d)" />
           <div className="flex items-center gap-2">
             <TickerBadge ticker={data.hottestStock.ticker} size="md" />
@@ -188,7 +187,7 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
       )}
 
       {data.biggestTrade && (
-        <Card onClick={() => data.biggestTrade.filer && navigate(`/filer/${data.biggestTrade.filer.id}`)}>
+        <Card to={data.biggestTrade.filer ? `/filer/${data.biggestTrade.filer.id}` : undefined}>
           <Metric label="Biggest single trade" />
           <div className="flex items-center gap-2">
             <span className="text-[1rem] font-semibold text-ink tabular-nums">{fmtUSD(data.biggestTrade.mid)}</span>

@@ -3,9 +3,8 @@ import FilterBar, { applyFilters, defaultFilters } from "../components/FilterBar
 import PersonalTimeline from "../components/PersonalTimeline";
 import { FilerAvatar } from "../components/TablePrimitives";
 import { TickerBadge } from "../components/TickerBadge";
-import { navigate } from "../router";
 import TradesTable from "../TradesTable";
-import { bestAssetNameByTicker, Card, fmtInt, fmtUSD, Link, SectionHeader } from "../ui";
+import { bestAssetNameByTicker, Card, fmtInt, fmtUSD, Link, RowLink, SectionHeader } from "../ui";
 
 export default function TickerPage({ symbol, filersById }) {
   const [data, setData] = useState(null);
@@ -171,10 +170,10 @@ export default function TickerPage({ symbol, filersById }) {
             {stats.topFilers.map((f) => {
               const lookup = filersById?.get?.(f.id) ?? { full_name: f.name, chamber: f.chamber, branch: f.branch };
               return (
-                <button
+                <RowLink
                   key={f.id}
-                  onClick={() => navigate(`/filer/${f.id}`)}
-                  className="px-4 py-[10px] flex items-center gap-2.5 hover:bg-muted text-left min-w-0"
+                  to={`/filer/${f.id}`}
+                  className="px-4 py-[10px] flex items-center gap-2.5 hover:bg-muted text-left min-w-0 text-ink no-underline"
                 >
                   <FilerAvatar filer={lookup} size={28} />
                   <div className="flex-1 min-w-0">
@@ -183,7 +182,7 @@ export default function TickerPage({ symbol, filersById }) {
                       {f.count} · {fmtUSD(f.vol)}
                     </div>
                   </div>
-                </button>
+                </RowLink>
               );
             })}
           </div>

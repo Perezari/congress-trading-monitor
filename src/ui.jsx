@@ -226,6 +226,37 @@ export function branchPill(filer) {
   return { tone: "blue", label: "House" };
 }
 
+// Drop-in replacement for clickable list rows that previously rendered as
+// <button onClick={() => navigate(...)}>. Renders a real <a href> so the
+// browser handles cmd/ctrl/shift/middle click (open in new tab) natively;
+// plain left-clicks still route through the SPA navigator. When `to` is
+// missing the component still renders (as a div) so callers can pass
+// optional destinations without branching.
+export function RowLink({ to, onClick, className = "", children, ...rest }) {
+  if (!to) {
+    return (
+      <div className={className} {...rest}>
+        {children}
+      </div>
+    );
+  }
+  return (
+    <a
+      href={to}
+      className={className}
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        e.preventDefault();
+        onClick?.(e);
+        navigate(to);
+      }}
+      {...rest}
+    >
+      {children}
+    </a>
+  );
+}
+
 export function Link({ to, className = "", children, onClick, ...rest }) {
   return (
     <a
@@ -245,8 +276,18 @@ export function Link({ to, className = "", children, onClick, ...rest }) {
 }
 
 // Linear-style card: white surface, 1px border in --bg-border-color, 8px radius, no shadow.
-export function Card({ children, className = "" }) {
-  return <div className={`border border-stroke rounded-md bg-panel ${className}`}>{children}</div>;
+// When `to` is set the card renders as a RowLink so the whole surface is
+// cmd/ctrl-clickable (and middle-clickable) to open in a new tab.
+export function Card({ children, className = "", to }) {
+  const base = `border border-stroke rounded-md bg-panel ${className}`;
+  if (to) {
+    return (
+      <RowLink to={to} className={`block text-ink no-underline hover:bg-muted/40 ${base}`}>
+        {children}
+      </RowLink>
+    );
+  }
+  return <div className={base}>{children}</div>;
 }
 
 export function SectionHeader({ title, subtitle, right }) {

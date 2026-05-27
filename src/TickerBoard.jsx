@@ -1,7 +1,6 @@
 import React from "react";
 import { TickerLabel } from "./components/TickerBadge";
-import { navigate } from "./router";
-import { TABLE_HEADER_CLS } from "./ui";
+import { RowLink, TABLE_HEADER_CLS } from "./ui";
 
 function dailyChange(p) {
   if (!p?.latest || !p?.previous) return null;
@@ -14,7 +13,9 @@ function dailyChange(p) {
 export default function TickerBoard({ tickers, prices = {} }) {
   return (
     <div className="border border-stroke rounded-md bg-panel overflow-hidden">
-      <div className={`grid grid-cols-[72px_minmax(0,1fr)_88px_96px] gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}>
+      <div
+        className={`grid grid-cols-[72px_minmax(0,1fr)_88px_96px] gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
+      >
         <span>Ticker</span>
         <span className="tabular-nums text-right">Δ1d</span>
         <span className="tabular-nums text-right">Trades</span>
@@ -24,19 +25,17 @@ export default function TickerBoard({ tickers, prices = {} }) {
         {tickers.map((t, i) => {
           const change = dailyChange(prices[t.ticker]);
           return (
-            <button
+            <RowLink
               key={t.ticker}
-              onClick={() => navigate(`/ticker/${t.ticker}`)}
-              className="w-full grid grid-cols-[72px_minmax(0,1fr)_88px_96px] gap-3 px-4 py-[10px] items-center text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted"
+              to={`/ticker/${t.ticker}`}
+              className="w-full grid grid-cols-[72px_minmax(0,1fr)_88px_96px] gap-3 px-4 py-[10px] items-center text-left text-ink no-underline even:bg-[lch(95.5%_0_282)] hover:bg-muted"
             >
               <div className="flex items-center gap-1.5 min-w-0">
                 <TickerLabel ticker={t.ticker} size="sm" />
               </div>
               <div className="text-right tabular-nums">
                 {change != null ? (
-                  <span
-                    className={`text-small whitespace-nowrap ${change >= 0 ? "text-buy" : "text-sell"}`}
-                  >
+                  <span className={`text-small whitespace-nowrap ${change >= 0 ? "text-buy" : "text-sell"}`}>
                     {change >= 0 ? "+" : ""}
                     {change.toFixed(1)}%
                   </span>
@@ -53,7 +52,7 @@ export default function TickerBoard({ tickers, prices = {} }) {
                 <span className="text-ink_faint mx-[2px]">/</span>
                 <span className="text-sell">{t.sales}</span>
               </span>
-            </button>
+            </RowLink>
           );
         })}
       </div>

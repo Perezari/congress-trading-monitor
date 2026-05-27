@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
-import { navigate } from "../router";
-import { dateInAdmin, findAdmin, fmtInt, fmtUSD, Link, SectionHeader, TABLE_HEADER_CLS } from "../ui";
+import { dateInAdmin, findAdmin, fmtInt, fmtUSD, Link, RowLink, SectionHeader, TABLE_HEADER_CLS } from "../ui";
 import { FilerAvatar } from "./TablePrimitives";
 
 // Trump II cabinet spotlight. Surfaces executive-branch officials with any
@@ -80,16 +79,14 @@ export default function CabinetSpotlight({ filers, trades }) {
           {spotlight.officials.slice(0, 10).map((o, i) => {
             const netBias = o.trades ? ((o.buys - o.sells) / o.trades) * 100 : 0;
             return (
-              <button
+              <RowLink
                 key={o.id}
-                onClick={() => navigate(`/filer/${o.id}`)}
-                className="w-full px-3 py-3 text-left even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
+                to={`/filer/${o.id}`}
+                className="block w-full px-3 py-3 text-left text-ink no-underline even:bg-[lch(95.5%_0_282)] hover:bg-muted/70"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0 text-right">
-                      {i + 1}
-                    </span>
+                    <span className="text-mini text-ink_faint tabular-nums w-5 shrink-0 text-right">{i + 1}</span>
                     <FilerAvatar filer={o} size={28} />
                     <div className="min-w-0">
                       <div className="text-small text-ink font-medium truncate">{o.name}</div>
@@ -110,73 +107,67 @@ export default function CabinetSpotlight({ filers, trades }) {
                     <span className="text-ink_faint mx-[2px]">/</span>
                     <span className="text-sell">{o.sells}</span>
                   </span>
-                  <span
-                    className={
-                      netBias > 20
-                        ? "text-buy"
-                        : netBias < -20
-                          ? "text-sell"
-                          : "text-ink_faint"
-                    }
-                  >
+                  <span className={netBias > 20 ? "text-buy" : netBias < -20 ? "text-sell" : "text-ink_faint"}>
                     {netBias > 20 ? "buy bias" : netBias < -20 ? "sell bias" : "balanced"}
                   </span>
                 </div>
-              </button>
+              </RowLink>
             );
           })}
         </div>
         {/* Desktop: full grid table. */}
         <div className="hidden lg:block overflow-x-auto">
-        <div className="min-w-[720px]">
-        <div className={`grid grid-cols-[32px_minmax(0,1.3fr)_minmax(0,1fr)_70px_136px_110px] gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}>
-          <span className="text-right">#</span>
-          <span>Official</span>
-          <span>Agency</span>
-          <span className="tabular-nums text-right">Trades</span>
-          <span className="tabular-nums text-right">Buy / Sell · bias</span>
-          <span className="tabular-nums text-right">Est. volume</span>
-        </div>
-        <div className="divide-y divide-stroke_soft">
-          {spotlight.officials.slice(0, 10).map((o, i) => {
-            const netBias = o.trades ? ((o.buys - o.sells) / o.trades) * 100 : 0;
-            const biasArrow = netBias > 20 ? "↑" : netBias < -20 ? "↓" : "•";
-            const biasTone = netBias > 20 ? "text-buy" : netBias < -20 ? "text-sell" : "text-ink_faint";
-            return (
-              <button
-                key={o.id}
-                onClick={() => navigate(`/filer/${o.id}`)}
-                className="w-full grid grid-cols-[32px_minmax(0,1.3fr)_minmax(0,1fr)_70px_136px_110px] gap-3 px-4 py-[10px] items-center text-left text-small hover:bg-muted/70"
-              >
-                <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <FilerAvatar filer={o} size={28} />
-                  <div className="min-w-0">
-                    <div className="text-ink font-medium truncate">{o.name}</div>
-                    <div className="text-mini text-ink_muted truncate">{o.level || "Official"}</div>
-                  </div>
-                </div>
-                <span className="text-ink_muted truncate">{o.agency || "—"}</span>
-                <span className="tabular-nums text-right text-ink">{fmtInt(o.trades)}</span>
-                <div className="flex items-center justify-end gap-2">
-                  <span className="text-mini tabular-nums whitespace-nowrap">
-                    <span className="text-buy">{o.buys}</span>
-                    <span className="text-ink_faint mx-[2px]">/</span>
-                    <span className="text-sell">{o.sells}</span>
-                  </span>
-                  <span
-                    className={`text-small tabular-nums w-[12px] text-center ${biasTone}`}
-                    title={`Net bias ${netBias.toFixed(0)}%`}
+          <div className="min-w-[720px]">
+            <div
+              className={`grid grid-cols-[32px_minmax(0,1.3fr)_minmax(0,1fr)_70px_136px_110px] gap-3 px-4 py-[10px] border-b border-stroke items-center ${TABLE_HEADER_CLS}`}
+            >
+              <span className="text-right">#</span>
+              <span>Official</span>
+              <span>Agency</span>
+              <span className="tabular-nums text-right">Trades</span>
+              <span className="tabular-nums text-right">Buy / Sell · bias</span>
+              <span className="tabular-nums text-right">Est. volume</span>
+            </div>
+            <div className="divide-y divide-stroke_soft">
+              {spotlight.officials.slice(0, 10).map((o, i) => {
+                const netBias = o.trades ? ((o.buys - o.sells) / o.trades) * 100 : 0;
+                const biasArrow = netBias > 20 ? "↑" : netBias < -20 ? "↓" : "•";
+                const biasTone = netBias > 20 ? "text-buy" : netBias < -20 ? "text-sell" : "text-ink_faint";
+                return (
+                  <RowLink
+                    key={o.id}
+                    to={`/filer/${o.id}`}
+                    className="w-full grid grid-cols-[32px_minmax(0,1.3fr)_minmax(0,1fr)_70px_136px_110px] gap-3 px-4 py-[10px] items-center text-left text-small text-ink no-underline hover:bg-muted/70"
                   >
-                    {biasArrow}
-                  </span>
-                </div>
-                <span className="tabular-nums text-right text-ink_muted">{fmtUSD(o.volume)}</span>
-              </button>
-            );
-          })}
-        </div>
-        </div>
+                    <span className="text-right text-mini text-ink_faint tabular-nums">{i + 1}</span>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <FilerAvatar filer={o} size={28} />
+                      <div className="min-w-0">
+                        <div className="text-ink font-medium truncate">{o.name}</div>
+                        <div className="text-mini text-ink_muted truncate">{o.level || "Official"}</div>
+                      </div>
+                    </div>
+                    <span className="text-ink_muted truncate">{o.agency || "—"}</span>
+                    <span className="tabular-nums text-right text-ink">{fmtInt(o.trades)}</span>
+                    <div className="flex items-center justify-end gap-2">
+                      <span className="text-mini tabular-nums whitespace-nowrap">
+                        <span className="text-buy">{o.buys}</span>
+                        <span className="text-ink_faint mx-[2px]">/</span>
+                        <span className="text-sell">{o.sells}</span>
+                      </span>
+                      <span
+                        className={`text-small tabular-nums w-[12px] text-center ${biasTone}`}
+                        title={`Net bias ${netBias.toFixed(0)}%`}
+                      >
+                        {biasArrow}
+                      </span>
+                    </div>
+                    <span className="tabular-nums text-right text-ink_muted">{fmtUSD(o.volume)}</span>
+                  </RowLink>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </div>
