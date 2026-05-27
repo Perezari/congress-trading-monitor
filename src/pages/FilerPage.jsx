@@ -759,8 +759,8 @@ function ImaginaryPortfolio({ trades }) {
   return (
     <div className="mb-10">
       <SectionHeader
-        title="Imaginary portfolio"
-        subtitle="Every disclosed buy held to today's close. Sells are not subtracted."
+        title="If they held everything"
+        subtitle="Real disclosed buys at today's prices. The numbers are real; the assumption (still holding, never rebalanced) is the hypothetical."
       />
 
       <Card className="p-4 sm:p-5 mb-4">
