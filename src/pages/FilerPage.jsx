@@ -501,7 +501,7 @@ function isLongHold(dateStr) {
 // "What drove this alpha" breakdown. Shows the top 8 purchases by absolute
 // contribution to the weighted-alpha numerator, plus a headline that states
 // how concentrated the excess return really is.
-const DRIVER_GRID = "28px 84px minmax(0,1fr) 92px 60px 80px 80px 80px 44px";
+const DRIVER_GRID = "28px 84px minmax(0,1fr) 92px 56px 76px 72px 72px 68px";
 
 function AlphaDriversSection({ drivers, trades }) {
   const bestNames = useMemo(() => bestAssetNameByTicker(trades), [trades]);
@@ -659,7 +659,7 @@ function AlphaDriversSection({ drivers, trades }) {
                           className="text-ink_muted hover:text-accent text-mini whitespace-nowrap"
                           title={
                             d.doc_url.includes("efdsearch.senate.gov")
-                              ? "Open filing detail page on the Senate EFD portal"
+                              ? "Senate eFD portal. First click → accept eFD terms. Second click → lands on the filing."
                               : "Open original PDF filing"
                           }
                         >

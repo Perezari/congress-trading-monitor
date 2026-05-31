@@ -300,7 +300,7 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                         className="text-ink_muted hover:text-accent text-mini tabular-nums whitespace-nowrap"
                         title={
                           t.doc_url.includes("efdsearch.senate.gov")
-                            ? "Open filing detail page on the Senate EFD portal (one-time terms acceptance)"
+                            ? "Senate eFD portal. First click → accept eFD terms. Second click → lands on the filing."
                             : "Open original PDF filing"
                         }
                       >
