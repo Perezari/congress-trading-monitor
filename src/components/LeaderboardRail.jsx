@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { fmtInt, fmtUSD } from "../ui";
+import { fmtInt, fmtUSD, RowLink } from "../ui";
 import { FilerAvatar } from "./TablePrimitives";
 import { TickerBadge } from "./TickerBadge";
 
@@ -7,23 +7,29 @@ import { TickerBadge } from "./TickerBadge";
 // who trades most, who earns most, which stock is hot, who has the best hit rate,
 // what's the biggest single trade.
 
-function Card({ children, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="text-left p-3.5 rounded-md border border-stroke bg-panel hover:border-ink_faint hover:shadow-card transition-all flex flex-col gap-1.5 h-full"
-    >
-      {children}
-    </button>
-  );
+// Compact KPI cell. Renders identically on every breakpoint — the parent
+// grid controls 2-column on mobile vs 5-column on desktop. Padding is
+// uniform (p-3) which is tight enough that 5 cells in a 2x3 grid fit in
+// ~270px of vertical space on a phone, vs ~750px before.
+//
+// Renders as a RowLink when `to` is set (whole-card cmd+clickable) or a
+// plain div otherwise. Optional className is appended so callers can grant
+// individual cards col-span on mobile.
+function Card({ children, to, className = "" }) {
+  const base =
+    "text-left p-3 rounded-md border border-stroke bg-panel hover:border-ink_faint hover:shadow-card transition-all flex flex-col gap-1 h-full min-w-0";
+  if (to) {
+    return (
+      <RowLink to={to} className={`${base} text-ink no-underline ${className}`}>
+        {children}
+      </RowLink>
+    );
+  }
+  return <div className={`${base} ${className}`}>{children}</div>;
 }
 
 function Metric({ label }) {
-  return (
-    <div>
-      <span className="text-mini text-ink_muted font-medium">{label}</span>
-    </div>
-  );
+  return <span className="text-mini text-ink_muted font-medium truncate">{label}</span>;
 }
 
 export default function LeaderboardRail({ filers = [], returns = [], trades = [], prices = {}, stats = {} }) {
@@ -114,13 +120,17 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
     return { mostActive, highestAlpha, hottestStock, bestHitRate, biggestTrade };
   }, [filers, returns, trades, prices]);
 
+  // Mobile: 2-column grid. The 5th cell (Biggest trade) spans both columns
+  // on the bottom row so it has room for the larger headline number and the
+  // filer/date sub-line without truncating awkwardly. Desktop is unchanged
+  // — single row of 5 equal cards.
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-3 auto-rows-fr">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3 auto-rows-fr">
       {data.mostActive && (
         <Card to={`/filer/${data.mostActive.id}`}>
           <Metric label="Most active" />
-          <div className="flex items-center gap-2.5">
-            <FilerAvatar filer={data.mostActive} size={32} />
+          <div className="flex items-center gap-2 min-w-0">
+            <FilerAvatar filer={data.mostActive} size={24} />
             <div className="min-w-0 flex-1">
               <div className="text-small font-medium text-ink truncate">{data.mostActive.full_name}</div>
               <div className="text-mini text-ink_muted tabular-nums">{fmtInt(data.mostActive.metric)} trades</div>
@@ -132,16 +142,16 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
       {data.highestAlpha && (
         <Card to={`/filer/${data.highestAlpha.id}`}>
           <Metric label="Biggest outperformer" />
-          <div className="flex items-center gap-2.5">
-            <FilerAvatar filer={data.highestAlpha} size={32} />
+          <div className="flex items-center gap-2 min-w-0">
+            <FilerAvatar filer={data.highestAlpha} size={24} />
             <div className="min-w-0 flex-1">
               <div className="text-small font-medium text-ink truncate">{data.highestAlpha.full_name}</div>
-              <div className="text-mini tabular-nums">
+              <div className="text-mini tabular-nums truncate">
                 <span className={data.highestAlpha.metric >= 0 ? "text-buy font-semibold" : "text-sell font-semibold"}>
                   {data.highestAlpha.metric >= 0 ? "+" : ""}
                   {data.highestAlpha.metric.toFixed(0)}%
                 </span>
-                <span className="text-ink_muted"> vs SPY · n={data.highestAlpha.scored_buys}</span>
+                <span className="text-ink_muted"> vs SPY</span>
               </div>
             </div>
           </div>
@@ -151,19 +161,19 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
       {data.hottestStock && (
         <Card to={`/ticker/${data.hottestStock.ticker}`}>
           <Metric label="Hot stock (60d)" />
-          <div className="flex items-center gap-2">
-            <TickerBadge ticker={data.hottestStock.ticker} size="md" />
+          <div className="flex items-center gap-2 min-w-0">
+            <TickerBadge ticker={data.hottestStock.ticker} size="sm" />
             {data.hottestStock.change != null && (
               <span
-                className={`text-mini tabular-nums font-semibold ${data.hottestStock.change >= 0 ? "text-buy" : "text-sell"}`}
+                className={`text-small tabular-nums font-semibold ${data.hottestStock.change >= 0 ? "text-buy" : "text-sell"}`}
               >
                 {data.hottestStock.change >= 0 ? "+" : ""}
                 {data.hottestStock.change.toFixed(1)}%
               </span>
             )}
           </div>
-          <div className="text-mini text-ink_muted tabular-nums">
-            {fmtInt(data.hottestStock.trades)} trades in last 60 days
+          <div className="text-mini text-ink_muted tabular-nums truncate">
+            {fmtInt(data.hottestStock.trades)} trades · 60d
           </div>
         </Card>
       )}
@@ -171,26 +181,29 @@ export default function LeaderboardRail({ filers = [], returns = [], trades = []
       {stats?.disclosureLag?.medianDaysToFile != null && (
         <Card>
           <Metric label="Disclosure lag" />
-          <div className="flex items-baseline gap-2">
-            <span className="text-[1rem] font-semibold text-ink tabular-nums">
+          <div className="flex items-baseline gap-1.5 min-w-0">
+            <span className="text-small font-semibold text-ink tabular-nums">
               {stats.disclosureLag.medianDaysToFile}d
             </span>
-            <span className="text-mini text-ink_muted">median · 45d limit</span>
+            <span className="text-mini text-ink_muted truncate">median · 45d cap</span>
           </div>
-          <div className="text-mini tabular-nums">
+          <div className="text-mini tabular-nums truncate">
             <span className="text-warn font-semibold">
               {((stats.disclosureLag.lateCount / stats.disclosureLag.tradesWithLag) * 100).toFixed(0)}%
             </span>
-            <span className="text-ink_muted"> filed after the deadline</span>
+            <span className="text-ink_muted"> late</span>
           </div>
         </Card>
       )}
 
       {data.biggestTrade && (
-        <Card to={data.biggestTrade.filer ? `/filer/${data.biggestTrade.filer.id}` : undefined}>
+        <Card
+          to={data.biggestTrade.filer ? `/filer/${data.biggestTrade.filer.id}` : undefined}
+          className="col-span-2 md:col-span-1"
+        >
           <Metric label="Biggest single trade" />
-          <div className="flex items-center gap-2">
-            <span className="text-[1rem] font-semibold text-ink tabular-nums">{fmtUSD(data.biggestTrade.mid)}</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-small font-semibold text-ink tabular-nums">{fmtUSD(data.biggestTrade.mid)}</span>
             {data.biggestTrade.ticker && <TickerBadge ticker={data.biggestTrade.ticker} size="sm" />}
           </div>
           <div className="text-mini text-ink_muted truncate">
