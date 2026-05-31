@@ -578,7 +578,7 @@ function AlphaDriversSection({ drivers, trades }) {
                       rel="noopener noreferrer"
                       className="text-ink_muted hover:text-accent whitespace-nowrap shrink-0"
                     >
-                      PDF&nbsp;↗
+                      {d.doc_url.includes("efdsearch.senate.gov") ? "Details" : "PDF"}&nbsp;↗
                     </a>
                   )}
                 </div>
@@ -657,9 +657,13 @@ function AlphaDriversSection({ drivers, trades }) {
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
                           className="text-ink_muted hover:text-accent text-mini whitespace-nowrap"
-                          title="Open original PDF filing"
+                          title={
+                            d.doc_url.includes("efdsearch.senate.gov")
+                              ? "Open filing detail page on the Senate EFD portal"
+                              : "Open original PDF filing"
+                          }
                         >
-                          PDF&nbsp;↗
+                          {d.doc_url.includes("efdsearch.senate.gov") ? "Details" : "PDF"}&nbsp;↗
                         </a>
                       )}
                     </div>

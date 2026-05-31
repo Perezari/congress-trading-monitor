@@ -298,9 +298,13 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
                         className="text-ink_muted hover:text-accent text-mini tabular-nums whitespace-nowrap"
-                        title="Open original PDF filing"
+                        title={
+                          t.doc_url.includes("efdsearch.senate.gov")
+                            ? "Open filing detail page on the Senate EFD portal (one-time terms acceptance)"
+                            : "Open original PDF filing"
+                        }
                       >
-                        PDF&nbsp;↗
+                        {t.doc_url.includes("efdsearch.senate.gov") ? "Details" : "PDF"}&nbsp;↗
                       </a>
                     )}
                   </div>
@@ -437,7 +441,7 @@ function MobileTradeCard({ t, filersById }) {
               onClick={(e) => e.stopPropagation()}
               className="text-ink_muted hover:text-accent whitespace-nowrap shrink-0"
             >
-              PDF&nbsp;↗
+              {t.doc_url.includes("efdsearch.senate.gov") ? "Details" : "PDF"}&nbsp;↗
             </a>
           )}
         </div>
