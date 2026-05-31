@@ -578,7 +578,7 @@ function AlphaDriversSection({ drivers, trades }) {
                       rel="noopener noreferrer"
                       className="text-ink_muted hover:text-accent whitespace-nowrap shrink-0"
                     >
-                      {d.doc_url.includes("efdsearch.senate.gov") ? "Details" : "PDF"}&nbsp;↗
+                      {d.doc_url.includes("efdsearch.senate.gov") ? "Source" : "PDF"}&nbsp;↗
                     </a>
                   )}
                 </div>
@@ -663,7 +663,7 @@ function AlphaDriversSection({ drivers, trades }) {
                               : "Open original PDF filing"
                           }
                         >
-                          {d.doc_url.includes("efdsearch.senate.gov") ? "Details" : "PDF"}&nbsp;↗
+                          {d.doc_url.includes("efdsearch.senate.gov") ? "Source" : "PDF"}&nbsp;↗
                         </a>
                       )}
                     </div>

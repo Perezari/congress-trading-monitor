@@ -304,7 +304,7 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                             : "Open original PDF filing"
                         }
                       >
-                        {t.doc_url.includes("efdsearch.senate.gov") ? "Details" : "PDF"}&nbsp;↗
+                        {t.doc_url.includes("efdsearch.senate.gov") ? "Source" : "PDF"}&nbsp;↗
                       </a>
                     )}
                   </div>
@@ -441,7 +441,7 @@ function MobileTradeCard({ t, filersById }) {
               onClick={(e) => e.stopPropagation()}
               className="text-ink_muted hover:text-accent whitespace-nowrap shrink-0"
             >
-              {t.doc_url.includes("efdsearch.senate.gov") ? "Details" : "PDF"}&nbsp;↗
+              {t.doc_url.includes("efdsearch.senate.gov") ? "Source" : "PDF"}&nbsp;↗
             </a>
           )}
         </div>
