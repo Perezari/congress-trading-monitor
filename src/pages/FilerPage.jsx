@@ -15,6 +15,7 @@ import {
   Link,
   RowLink,
   SectionHeader,
+  SourceLink,
   TABLE_HEADER_CLS,
 } from "../ui";
 
@@ -571,16 +572,7 @@ function AlphaDriversSection({ drivers, trades }) {
                       {ret.toFixed(0)}%
                     </span>
                   </span>
-                  {d.doc_url && (
-                    <a
-                      href={d.doc_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-ink_muted hover:text-accent whitespace-nowrap shrink-0"
-                    >
-                      {d.doc_url.includes("efdsearch.senate.gov") ? "Source" : "PDF"}&nbsp;↗
-                    </a>
-                  )}
+                  <SourceLink url={d.doc_url} className="shrink-0" />
                 </div>
               </div>
             );
@@ -600,7 +592,7 @@ function AlphaDriversSection({ drivers, trades }) {
               <span className="tabular-nums text-right">Size</span>
               <span className="tabular-nums text-right">Return</span>
               <span className="tabular-nums text-right">vs SPY</span>
-              <span className="text-right"></span>
+              <span className="text-right">Source</span>
             </div>
             <div className="divide-y divide-stroke_soft">
               {top.map((d, i) => {
@@ -650,22 +642,7 @@ function AlphaDriversSection({ drivers, trades }) {
                       {ex.toFixed(0)}%
                     </span>
                     <div className="text-right">
-                      {d.doc_url && (
-                        <a
-                          href={d.doc_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-ink_muted hover:text-accent text-mini whitespace-nowrap"
-                          title={
-                            d.doc_url.includes("efdsearch.senate.gov")
-                              ? "Senate eFD portal. First click → accept eFD terms. Second click → lands on the filing."
-                              : "Open original PDF filing"
-                          }
-                        >
-                          {d.doc_url.includes("efdsearch.senate.gov") ? "Source" : "PDF"}&nbsp;↗
-                        </a>
-                      )}
+                      <SourceLink url={d.doc_url} />
                     </div>
                   </div>
                 );

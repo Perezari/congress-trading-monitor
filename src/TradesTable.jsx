@@ -8,6 +8,7 @@ import {
   fmtUSD,
   Pill,
   RowLink,
+  SourceLink,
   TABLE_HEADER_CLS,
   TABLE_ZEBRA_CLS,
   txnColor,
@@ -23,7 +24,7 @@ const COLUMNS = [
   { key: "filing_date", label: "Filed", align: "right", sortable: true, width: "96px" },
   { key: "days_to_file", label: "Lag", align: "right", sortable: true, width: "56px" },
   { key: "excess_since", label: "vs SPY", align: "right", sortable: true, width: "80px" },
-  { key: "doc_url", label: "", align: "right", sortable: false, width: "36px" },
+  { key: "doc_url", label: "Source", align: "right", sortable: false, width: "60px" },
 ];
 
 const DEFAULT_PAGE_SIZE = 200;
@@ -291,22 +292,7 @@ export default function TradesTable({ trades, tall = false, sortCol, onSort, fil
                   </div>
 
                   <div className="text-right">
-                    {t.doc_url && (
-                      <a
-                        href={t.doc_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-ink_muted hover:text-accent text-mini tabular-nums whitespace-nowrap"
-                        title={
-                          t.doc_url.includes("efdsearch.senate.gov")
-                            ? "Senate eFD portal. First click → accept eFD terms. Second click → lands on the filing."
-                            : "Open original PDF filing"
-                        }
-                      >
-                        {t.doc_url.includes("efdsearch.senate.gov") ? "Source" : "PDF"}&nbsp;↗
-                      </a>
-                    )}
+                    <SourceLink url={t.doc_url} />
                   </div>
                 </div>
               );
@@ -433,17 +419,7 @@ function MobileTradeCard({ t, filersById }) {
       {(dateLine || t.doc_url) && (
         <div className="mt-1.5 ml-9 flex items-center justify-between gap-2 text-mini text-ink_muted tabular-nums">
           <span className={`font-mono truncate ${t.is_late ? "text-warn font-medium" : ""}`}>{dateLine}</span>
-          {t.doc_url && (
-            <a
-              href={t.doc_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="text-ink_muted hover:text-accent whitespace-nowrap shrink-0"
-            >
-              {t.doc_url.includes("efdsearch.senate.gov") ? "Source" : "PDF"}&nbsp;↗
-            </a>
-          )}
+          <SourceLink url={t.doc_url} className="shrink-0" />
         </div>
       )}
     </div>
