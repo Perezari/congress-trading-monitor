@@ -1,0 +1,31 @@
+name: Sync fork from upstream
+
+# Keeps this fork in lockstep with kadoa-org/congress-trading-monitor.
+# Every day it fast-forwards `main` to whatever kadoa-bot has pushed
+# upstream (the daily data refresh). Fast-forward only: if this fork ever
+# diverges (you commit your own changes to main), the run fails loudly
+# instead of force-overwriting your work.
+
+on:
+  schedule:
+    # 08:00 UTC daily. Upstream's "Daily refresh" bot pushes ~05:30 UTC,
+    # so this leaves a comfortable buffer. GitHub may delay scheduled runs
+    # by a few minutes during peak load — that's expected.
+    - cron: '0 8 * * *'
+  # Lets you trigger a sync on demand from the Actions tab (no waiting).
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fast-forward main from kadoa-org
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          gh repo sync ${{ github.repository }}
+          --source kadoa-org/congress-trading-monitor
+          --branch main
