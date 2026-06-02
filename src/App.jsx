@@ -8,35 +8,35 @@ import OverviewPage from "./pages/OverviewPage";
 import TickerPage from "./pages/TickerPage";
 import TickersPage from "./pages/TickersPage";
 import TradesPage from "./pages/TradesPage";
-import { useRoute } from "./router";
+import { useRoute, withBase } from "./router";
 
 async function loadAll() {
   const [stats, trades, filers, tickers, scatter, returns, prices, alphaIndex, adminStats] = await Promise.all([
-    fetch("/data/stats.json")
+    fetch(withBase("/data/stats.json"))
       .then((r) => r.json())
       .catch(() => null),
-    fetch("/data/trades.json")
+    fetch(withBase("/data/trades.json"))
       .then((r) => r.json())
       .catch(() => []),
-    fetch("/data/filers.json")
+    fetch(withBase("/data/filers.json"))
       .then((r) => r.json())
       .catch(() => []),
-    fetch("/data/tickers.json")
+    fetch(withBase("/data/tickers.json"))
       .then((r) => r.json())
       .catch(() => []),
-    fetch("/data/scatter.json")
+    fetch(withBase("/data/scatter.json"))
       .then((r) => r.json())
       .catch(() => ({ filers: [], trades: [] })),
-    fetch("/data/returns.json")
+    fetch(withBase("/data/returns.json"))
       .then((r) => (r.ok ? r.json() : []))
       .catch(() => []),
-    fetch("/data/prices.json")
+    fetch(withBase("/data/prices.json"))
       .then((r) => (r.ok ? r.json() : {}))
       .catch(() => ({})),
-    fetch("/data/alpha-index.json")
+    fetch(withBase("/data/alpha-index.json"))
       .then((r) => (r.ok ? r.json() : {}))
       .catch(() => ({})),
-    fetch("/data/admin-stats.json")
+    fetch(withBase("/data/admin-stats.json"))
       .then((r) => (r.ok ? r.json() : {}))
       .catch(() => ({})),
   ]);

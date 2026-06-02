@@ -18,6 +18,7 @@ import {
   SourceLink,
   TABLE_HEADER_CLS,
 } from "../ui";
+import { withBase } from "../router";
 
 function role(f) {
   if (!f) return "";
@@ -40,7 +41,7 @@ export default function FilerPage({ filerId, filersIndex, filersById, prices: pr
   useEffect(() => {
     setData(null);
     setError(null);
-    fetch(`/data/filer/${encodeURIComponent(filerId)}.json`)
+    fetch(withBase(`/data/filer/${encodeURIComponent(filerId)}.json`))
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then(setData)
       .catch(setError);

@@ -5,6 +5,7 @@ import { FilerAvatar } from "../components/TablePrimitives";
 import { TickerBadge } from "../components/TickerBadge";
 import TradesTable from "../TradesTable";
 import { bestAssetNameByTicker, Card, fmtInt, fmtUSD, Link, RowLink, SectionHeader } from "../ui";
+import { withBase } from "../router";
 
 export default function TickerPage({ symbol, filersById }) {
   const [data, setData] = useState(null);
@@ -14,7 +15,7 @@ export default function TickerPage({ symbol, filersById }) {
   useEffect(() => {
     setData(null);
     setError(null);
-    fetch(`/data/ticker/${encodeURIComponent(symbol)}.json`)
+    fetch(withBase(`/data/ticker/${encodeURIComponent(symbol)}.json`))
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then(setData)
       .catch(setError);
