@@ -1,0 +1,51 @@
+name: Sync data from upstream
+
+# Pulls ONLY public/data/ from kadoa-org's daily refresh into this fork, leaving
+# your own customisations (UI changes, deploy config) untouched. When the data
+# actually changes it's committed to main, which triggers the Deploy workflow to
+# rebuild and publish the site with fresh filings.
+#
+# This replaces the old whole-repo fast-forward sync: once the fork carries your
+# own commits it has diverged from upstream, so a fast-forward would fail. A
+# data-only merge sidesteps that entirely.
+
+on:
+  schedule:
+    # 08:00 UTC daily. Upstream's "Daily refresh" bot pushes ~05:30 UTC.
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write # commit + push the refreshed data
+  actions: write # trigger the Deploy workflow after a data change
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Pull public/data from upstream
+        run: |
+          git remote add upstream https://github.com/kadoa-org/congress-trading-monitor.git
+          git fetch --depth=1 upstream main
+          # Make public/data exactly match upstream — including any files it removed.
+          rm -rf public/data
+          git checkout upstream/main -- public/data
+          git add -A public/data
+
+      - name: Commit and trigger deploy if the data changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --cached --quiet; then
+            echo "No data changes from upstream."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Daily data sync from upstream"
+            git push
+            gh workflow run deploy.yml
+          fi

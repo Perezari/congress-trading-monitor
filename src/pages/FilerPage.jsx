@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import FilterBar, { applyFilters, defaultFilters } from "../components/FilterBar";
+import FilterBar, { applyFilters, defaultFilters, InlineSearchInput, SingleSelectChip } from "../components/FilterBar";
 import PersonalTimeline from "../components/PersonalTimeline";
 import { FilerAvatar as AvatarPrimitive } from "../components/TablePrimitives";
 import { TickerBadge, TickerLabel } from "../components/TickerBadge";
@@ -675,6 +675,23 @@ function PortfolioStat({ label, value, valueTone = "text-ink", hint, hintTone = 
 // every disclosed buy to today's close. Reframes the hold-to-today methodology
 // as a feature rather than a caveat — "If Marshall never sold his 2017 NVDA,
 // he'd have a $3M tech portfolio today." The math is mid_amount × ret_since.
+// Sortable columns for the Live-portfolio holdings table. `cmp` sorts ascending;
+// the table multiplies by the active direction. `short` is the compact label used
+// in the mobile sort chip. Date strings are ISO so a plain string compare orders
+// them chronologically.
+const SORT_COLS = {
+  position: { label: "Position", short: "Name", align: "left", cmp: (a, b) => a.ticker.localeCompare(b.ticker) },
+  since: { label: "Since", short: "Since", align: "right", cmp: (a, b) => (a.firstDate || "").localeCompare(b.firstDate || "") },
+  cost: { label: "Cost basis", short: "Cost", align: "right", cmp: (a, b) => a.cost - b.cost },
+  value: { label: "Value today", short: "Value", align: "right", cmp: (a, b) => a.value - b.value },
+  gain: { label: "Gain", short: "Gain", align: "right", cmp: (a, b) => a.gainPct - b.gainPct },
+  weight: { label: "Share of portfolio", short: "Share", align: "right", cmp: (a, b) => a.weight - b.weight },
+};
+// Sensible initial direction when switching columns: alphabetical asc for the
+// name, biggest-first for everything numeric (and newest-first for the date).
+const DEFAULT_DIR = { position: "asc", since: "desc", cost: "desc", value: "desc", gain: "desc", weight: "desc" };
+const SORT_OPTIONS = Object.entries(SORT_COLS).map(([k, c]) => ({ k, label: c.short }));
+
 function ImaginaryPortfolio({ trades }) {
   const bestNames = useMemo(() => bestAssetNameByTicker(trades), [trades]);
   const data = useMemo(() => {
@@ -733,7 +750,58 @@ function ImaginaryPortfolio({ trades }) {
     };
   }, [trades]);
 
+  const [sortKey, setSortKey] = useState("value");
+  const [sortDir, setSortDir] = useState("desc");
+  const [query, setQuery] = useState("");
+
+  // Filter by ticker/name, then sort by the active column + direction. Defaults
+  // (value, desc) reproduce the original "top by value" order — now uncapped.
+  const visibleHoldings = useMemo(() => {
+    if (!data) return [];
+    const q = query.trim().toLowerCase();
+    const rows = q
+      ? data.holdings.filter((p) => {
+          const name = (bestNames.get(p.ticker) || p.asset_name || "").toLowerCase();
+          return p.ticker.toLowerCase().includes(q) || name.includes(q);
+        })
+      : data.holdings;
+    const cmp = (SORT_COLS[sortKey] || SORT_COLS.value).cmp;
+    const dir = sortDir === "asc" ? 1 : -1;
+    return [...rows].sort((a, b) => cmp(a, b) * dir);
+  }, [data, query, sortKey, sortDir, bestNames]);
+
   if (!data) return null;
+
+  // Clicking the active column flips direction; a new column resets to its default.
+  const applySort = (k) => {
+    if (k === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else {
+      setSortKey(k);
+      setSortDir(DEFAULT_DIR[k] || "desc");
+    }
+  };
+  const pickSort = (k) => {
+    setSortKey(k);
+    setSortDir(DEFAULT_DIR[k] || "desc");
+  };
+  const sortableHeader = (k) => {
+    const c = SORT_COLS[k];
+    const active = sortKey === k;
+    return (
+      <button
+        type="button"
+        onClick={() => applySort(k)}
+        className={`flex items-center gap-1 ${c.align === "left" ? "justify-start" : "justify-end"} ${
+          active ? "text-ink" : "text-ink_muted"
+        } hover:text-ink transition-colors`}
+      >
+        <span>{c.label}</span>
+        <span className="w-2 text-[9px] leading-none text-ink_faint">
+          {active ? (sortDir === "asc" ? "▲" : "▼") : ""}
+        </span>
+      </button>
+    );
+  };
 
   const HOLDINGS_GRID = "32px minmax(140px,1fr) 90px 110px 130px 90px 72px";
 
@@ -769,9 +837,26 @@ function ImaginaryPortfolio({ trades }) {
       </Card>
 
       <Card className="overflow-hidden">
+        <div className="flex items-center gap-2 px-3 py-2.5 border-b border-stroke">
+          <div className="flex-1 min-w-0">
+            <InlineSearchInput value={query} onChange={setQuery} placeholder="Filter positions…" width="100%" />
+          </div>
+          {/* Desktop sorts via clickable column headers; mobile gets explicit controls. */}
+          <div className="flex items-center gap-1.5 lg:hidden shrink-0">
+            <SingleSelectChip label="Sort" options={SORT_OPTIONS} value={sortKey} onChange={pickSort} />
+            <button
+              type="button"
+              onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+              title={sortDir === "asc" ? "Ascending" : "Descending"}
+              className="h-7 w-7 inline-flex items-center justify-center border border-stroke rounded-md bg-panel text-ink_muted hover:bg-muted transition-colors"
+            >
+              {sortDir === "asc" ? "↑" : "↓"}
+            </button>
+          </div>
+        </div>
         {/* Mobile: stacked rows with zebra striping. Desktop: full grid. */}
         <div className="lg:hidden divide-y divide-stroke_soft">
-          {data.holdings.slice(0, 15).map((p, i) => (
+          {visibleHoldings.map((p, i) => (
             <RowLink
               key={p.ticker}
               to={`/ticker/${p.ticker}`}
@@ -813,15 +898,15 @@ function ImaginaryPortfolio({ trades }) {
               style={{ gridTemplateColumns: HOLDINGS_GRID }}
             >
               <span className="text-right">#</span>
-              <span>Position</span>
-              <span className="tabular-nums text-right">Since</span>
-              <span className="tabular-nums text-right">Cost basis</span>
-              <span className="tabular-nums text-right">Value today</span>
-              <span className="tabular-nums text-right">Gain</span>
-              <span className="tabular-nums text-right">Share of portfolio</span>
+              {sortableHeader("position")}
+              {sortableHeader("since")}
+              {sortableHeader("cost")}
+              {sortableHeader("value")}
+              {sortableHeader("gain")}
+              {sortableHeader("weight")}
             </div>
             <div className="divide-y divide-stroke_soft">
-              {data.holdings.slice(0, 15).map((p, i) => (
+              {visibleHoldings.map((p, i) => (
                 <RowLink
                   key={p.ticker}
                   to={`/ticker/${p.ticker}`}
@@ -853,9 +938,16 @@ function ImaginaryPortfolio({ trades }) {
             </div>
           </div>
         </div>
-        {data.holdings.length > 15 && (
+        {visibleHoldings.length === 0 && (
+          <div className="px-4 py-8 text-center text-small text-ink_muted">
+            No positions match “{query.trim()}”.
+          </div>
+        )}
+        {visibleHoldings.length > 0 && (
           <div className="px-4 py-2 border-t border-stroke text-mini text-ink_muted text-center">
-            Showing top 15 of {data.holdings.length} positions by value
+            {query.trim()
+              ? `Showing ${visibleHoldings.length} of ${data.holdings.length} positions`
+              : `${data.holdings.length} positions`}
           </div>
         )}
       </Card>
