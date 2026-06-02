@@ -5,6 +5,7 @@ import AboutPage from "./pages/AboutPage";
 import FilerPage from "./pages/FilerPage";
 import FilersPage from "./pages/FilersPage";
 import OverviewPage from "./pages/OverviewPage";
+import SectorsPage from "./pages/SectorsPage";
 import TickerPage from "./pages/TickerPage";
 import TickersPage from "./pages/TickersPage";
 import TradesPage from "./pages/TradesPage";
@@ -169,6 +170,7 @@ export default function App() {
       {/* data.trades already available */}
       {route.name === "filers" && <FilersPage data={data} />}
       {route.name === "tickers" && <TickersPage data={data} />}
+      {route.name === "sectors" && <SectorsPage data={data} />}
       {route.name === "trades" && <TradesPage data={data} />}
       {route.name === "about" && <AboutPage data={data} />}
       {route.name === "filer" && (

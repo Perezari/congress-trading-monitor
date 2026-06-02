@@ -6,6 +6,7 @@ const TABS = [
   { to: "/", label: "Overview", match: "overview" },
   { to: "/filers", label: "Filers", match: "filers" },
   { to: "/tickers", label: "Tickers", match: "tickers" },
+  { to: "/sectors", label: "Sectors", match: "sectors" },
   { to: "/trades", label: "Trades", match: "trades" },
   { to: "/about", label: "About", match: "about" },
 ];
