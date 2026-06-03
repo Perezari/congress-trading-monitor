@@ -11,8 +11,11 @@ name: Sync data from upstream
 
 on:
   schedule:
-    # 08:00 UTC daily. Upstream's "Daily refresh" bot pushes ~05:30 UTC.
-    - cron: '0 8 * * *'
+    # Every 4 hours. Upstream's "Daily refresh" lands once a day but at a highly
+    # variable time (observed anywhere from ~05:30 to ~18:20 UTC), so a single
+    # morning run misses it on late days. Polling 6x/day catches it within ~4h
+    # whenever it ships; runs with no upstream change are cheap no-ops.
+    - cron: '0 */4 * * *'
   workflow_dispatch:
 
 permissions:
@@ -47,5 +50,8 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -m "Daily data sync from upstream"
             git push
-            gh workflow run deploy.yml
+            # Explicit --repo: a `upstream` remote is added above, and gh would
+            # otherwise resolve the wrong repo (kadoa-org) and 404. Also, pushes
+            # by GITHUB_TOKEN don't fire deploy's on:push, so trigger it directly.
+            gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY"
           fi
