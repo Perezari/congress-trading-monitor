@@ -7,5 +7,7 @@ import { defineConfig } from "vite";
 export default defineConfig(({ command }) => ({
   base: command === "build" ? "/congress-trading-monitor/" : "/",
   plugins: [react()],
-  server: { port: 5183 },
+  // allowedHosts: true — the dev server answers any hostname (skak-20515 on the
+  // LAN, localhost, whatever), so no machine name is baked into the config.
+  server: { port: 5183, allowedHosts: true },
 }));
